@@ -1,6 +1,6 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { spawn } from 'child_process';
+import { spawn, spawnSync } from 'child_process';
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'fs';
 import { dirname, resolve } from 'path';
 
@@ -96,6 +96,7 @@ export class 系统更新服务 {
     if (process.platform === 'win32') {
       throw new BadRequestException('一键更新仅支持 Linux Docker 服务器环境，本地 Windows 开发请复制命令手动执行');
     }
+    this.检查更新命令环境();
     if (this.是否有运行中任务()) {
       throw new BadRequestException('更新任务正在执行中，请稍后查看服务器日志');
     }
@@ -156,6 +157,7 @@ export class 系统更新服务 {
     if (process.platform === 'win32') {
       throw new BadRequestException('立即重启仅支持 Linux Docker 服务器环境');
     }
+    this.检查更新命令环境();
     if (this.是否有运行中任务()) {
       throw new BadRequestException('更新任务正在执行中，请稍后查看服务器日志');
     }
@@ -472,6 +474,35 @@ export class 系统更新服务 {
   private 确保更新工作目录(workdir: string) {
     if (!existsSync(workdir)) {
       throw new BadRequestException(`更新目录不存在：${workdir}`);
+    }
+  }
+
+  private 检查更新命令环境() {
+    const requiredCommands = [
+      { name: 'git', check: 'command -v git >/dev/null 2>&1' },
+      { name: 'docker', check: 'command -v docker >/dev/null 2>&1' },
+      { name: 'docker compose', check: 'docker compose version >/dev/null 2>&1' }
+    ];
+    const missing = requiredCommands
+      .filter((command) => !this.命令可执行(command.check))
+      .map((command) => command.name);
+
+    if (missing.length > 0) {
+      throw new BadRequestException(
+        `一键更新环境缺少命令：${missing.join('、')}。请先用服务器命令手动更新，或重建包含 git、docker-cli、docker-cli-compose 的镜像`
+      );
+    }
+  }
+
+  private 命令可执行(command: string) {
+    try {
+      const result = spawnSync('/bin/sh', ['-c', command], {
+        stdio: 'ignore',
+        timeout: 2000
+      });
+      return result.status === 0;
+    } catch {
+      return false;
     }
   }
 
