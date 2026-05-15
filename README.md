@@ -77,6 +77,20 @@ http://服务器IP:7790
 http://服务器IP:7790/api
 ```
 
+如果需要改端口、绑定地址或提前写入 MySQL 配置，可以先复制环境变量示例：
+
+```bash
+cp 部署配置/.env.example .env
+```
+
+然后编辑 `.env` 后再执行：
+
+```bash
+docker compose -f docker-compose.dev.yml up -d --build
+```
+
+不复制 `.env` 也可以直接启动，第一次打开网页会进入初始化向导。
+
 ## 第一次网页初始化
 
 第一次打开管理后台时，系统会显示“系统初始化设置”页面。
@@ -285,8 +299,27 @@ X-API-Token: 你的机器人密钥
 - 网页：`http://服务器IP:7790`
 - API：`http://服务器IP:7790/api`
 - 数据配置：`数据/系统配置.json`
+- 容器名：`activation-code-app`
+- 镜像名：`activation-code-backend:local`
 
 前端会在镜像构建时编译成静态文件，由后端 NestJS 同一个服务托管，不再单独启动 Vite 容器。
+
+Compose 已包含：
+
+- `restart: unless-stopped`：服务器重启后自动拉起容器。
+- 健康检查：定期访问 `/api/setup/status`。
+- 日志滚动：单个日志文件最大 20MB，最多保留 5 个。
+- `./数据:/app/data`：持久化网页初始化配置。
+- `.env` 支持：端口、绑定地址、时区、MySQL、JWT、机器人密钥都可配置。
+
+常用命令：
+
+```bash
+docker compose -f docker-compose.dev.yml ps
+docker compose -f docker-compose.dev.yml logs -f
+docker compose -f docker-compose.dev.yml restart
+docker compose -f docker-compose.dev.yml down
+```
 
 本地开发仍可使用两个命令分开热更新：
 

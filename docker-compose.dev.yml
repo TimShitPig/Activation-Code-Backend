@@ -3,12 +3,54 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
+    image: activation-code-backend:local
     container_name: activation-code-app
+    restart: unless-stopped
     working_dir: /app
+    ulimits:
+      nofile:
+        soft: 65535
+        hard: 65535
     volumes:
       - ./数据:/app/data
     ports:
-      - "7790:7790"
+      - "${BIND_HOST:-0.0.0.0}:${SERVER_PORT:-7790}:${PORT:-7790}"
     environment:
-      SYSTEM_CONFIG_PATH: "/app/data/系统配置.json"
-      PORT: "7790"
+      NODE_ENV: "production"
+      TZ: "${TZ:-Asia/Shanghai}"
+      PORT: "${PORT:-7790}"
+      SYSTEM_CONFIG_PATH: "${SYSTEM_CONFIG_PATH:-/app/data/系统配置.json}"
+      CORS_ORIGIN: "${CORS_ORIGIN:-*}"
+      MYSQL_HOST: "${MYSQL_HOST:-}"
+      MYSQL_PORT: "${MYSQL_PORT:-3306}"
+      MYSQL_USER: "${MYSQL_USER:-}"
+      MYSQL_PASSWORD: "${MYSQL_PASSWORD:-}"
+      MYSQL_DATABASE: "${MYSQL_DATABASE:-activation_system}"
+      INIT_ADMIN_USERNAME: "${INIT_ADMIN_USERNAME:-admin}"
+      INIT_ADMIN_PASSWORD: "${INIT_ADMIN_PASSWORD:-}"
+      JWT_SECRET: "${JWT_SECRET:-}"
+      JWT_EXPIRES_IN: "${JWT_EXPIRES_IN:-7d}"
+      ROBOT_API_TOKEN: "${ROBOT_API_TOKEN:-}"
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "node",
+          "-e",
+          "const http=require('http');const port=process.env.PORT||7790;const req=http.get({host:'127.0.0.1',port,path:'/api/setup/status',timeout:5000},res=>process.exit(res.statusCode<500?0:1));req.on('error',()=>process.exit(1));req.on('timeout',()=>{req.destroy();process.exit(1);});"
+        ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+    logging:
+      driver: json-file
+      options:
+        max-size: "20m"
+        max-file: "5"
+    networks:
+      - activation-code-network
+
+networks:
+  activation-code-network:
+    driver: bridge
