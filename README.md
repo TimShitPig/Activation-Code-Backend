@@ -282,6 +282,14 @@ X-API-Token: 你的机器人密钥
 
 当前 `docker-compose.dev.yml` 使用源码挂载。注意：Compose 服务名使用英文 `backend` 和 `admin`，这样兼容服务器上的 Docker Compose 校验规则；项目目录仍然保持中文分类。
 
+Dockerfile 已设置 npm 镜像源：
+
+```text
+https://registry.npmmirror.com
+```
+
+依赖会在镜像构建阶段安装，容器启动时不再重复执行 `npm install`。
+
 - 修改 `后端服务/` 代码后，NestJS watch 自动重启。
 - 修改 `管理后台/` 代码后，Vite HMR 自动刷新页面。
 - Windows 下已启用 polling，文件变更更稳定。

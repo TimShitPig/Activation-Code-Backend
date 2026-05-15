@@ -2,8 +2,10 @@ FROM node:22-alpine
 
 WORKDIR /app
 
-COPY package.json ./
-RUN npm install
+ENV npm_config_registry=https://registry.npmmirror.com
+
+COPY package*.json ./
+RUN npm install --no-audit --no-fund --prefer-offline --network-timeout=600000
 
 COPY . .
 
