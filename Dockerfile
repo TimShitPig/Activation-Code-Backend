@@ -9,7 +9,12 @@ COPY 管理后台/package.json ./管理后台/package.json
 RUN npm install --no-audit --no-fund --network-timeout=600000
 
 COPY . .
+ARG APP_COMMIT=unknown
+ARG APP_VERSION=
+ENV APP_COMMIT=${APP_COMMIT}
+ENV APP_VERSION=${APP_VERSION}
 ENV VITE_API_BASE=/api
+RUN node -e "const fs=require('fs');const pkg=require('./package.json');fs.writeFileSync('版本信息.json',JSON.stringify({version:process.env.APP_VERSION||pkg.version||'unknown',commit:process.env.APP_COMMIT||'unknown',buildTime:new Date().toISOString(),source:'docker'},null,2));"
 RUN npm run build -w 管理后台
 RUN npm run build -w 后端服务
 
@@ -28,6 +33,7 @@ COPY --from=builder /workspace/node_modules ./node_modules
 
 COPY --from=builder /workspace/后端服务/dist ./后端服务/dist
 COPY --from=builder /workspace/管理后台/dist ./管理后台/dist
+COPY --from=builder /workspace/版本信息.json ./版本信息.json
 
 EXPOSE 7790
 

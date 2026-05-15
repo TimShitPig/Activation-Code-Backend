@@ -333,6 +333,26 @@ button:disabled {
   font-size: 17px;
 }
 
+.区块标题行 {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+
+.区块标题行 h2,
+.区块标题行 h3 {
+  margin: 0;
+}
+
+.区块标题行 h3 {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 15px;
+}
+
 .流程网格,
 .设置网格 {
   display: grid;
@@ -555,14 +575,123 @@ button:disabled {
   grid-template-columns: 1fr 1fr;
 }
 
+.设置整行 {
+  grid-column: 1 / -1;
+}
+
 .详情列表 {
   display: grid;
   gap: 10px;
 }
 
+.详情列表 a {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: #2563eb;
+  text-decoration: none;
+  font-weight: 700;
+}
+
+.更新内容 {
+  display: grid;
+  gap: 14px;
+}
+
+.更新状态条 {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  border: 1px solid #d7dce5;
+  border-radius: 8px;
+  padding: 14px;
+  background: #f8fafc;
+}
+
+.更新状态条 strong,
+.更新状态条 span {
+  display: block;
+}
+
+.更新状态条 span {
+  color: #65758b;
+  font-size: 13px;
+  margin-top: 4px;
+}
+
+.更新状态条.有更新 {
+  border-color: #fed7aa;
+  background: #fff7ed;
+  color: #c2410c;
+}
+
+.更新状态条.已最新 {
+  border-color: #bbf7d0;
+  background: #ecfdf5;
+  color: #047857;
+}
+
+.更新状态条.检查失败 {
+  border-color: #fecaca;
+  background: #fef2f2;
+  color: #b91c1c;
+}
+
+.更新摘要 {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(140px, 1fr));
+  gap: 12px;
+}
+
+.更新摘要 div {
+  display: grid;
+  gap: 5px;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  padding: 12px;
+  background: #fafafa;
+}
+
+.更新摘要 span {
+  color: #65758b;
+  font-size: 13px;
+}
+
+.更新摘要 strong {
+  overflow-wrap: anywhere;
+}
+
+.版本详情 {
+  display: grid;
+  gap: 10px;
+}
+
+.更新命令区 {
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  padding: 14px;
+  background: #fafafa;
+}
+
+.更新命令区 pre {
+  margin: 0;
+  overflow-x: auto;
+  border-radius: 8px;
+  padding: 12px;
+  background: #111827;
+  color: #e5e7eb;
+  font-family: "Cascadia Mono", "Fira Code", monospace;
+  font-size: 13px;
+  line-height: 1.7;
+}
+
 @media (max-width: 1120px) {
   .统计网格 {
     grid-template-columns: repeat(3, 1fr);
+  }
+
+  .更新摘要 {
+    grid-template-columns: repeat(2, 1fr);
   }
 }
 
@@ -599,6 +728,16 @@ button:disabled {
 @media (max-width: 520px) {
   .统计网格 {
     grid-template-columns: 1fr;
+  }
+
+  .更新摘要,
+  .区块标题行 {
+    grid-template-columns: 1fr;
+  }
+
+  .区块标题行 {
+    display: grid;
+    align-items: stretch;
   }
 
   .登录面板 {

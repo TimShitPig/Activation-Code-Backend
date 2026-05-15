@@ -219,6 +219,8 @@ host.docker.internal
 
 - 查看当前管理员
 - 修改管理员密码
+- 检查 GitHub 最新提交和当前构建版本
+- 复制服务器更新命令
 
 ## 机器人接口
 
@@ -292,6 +294,7 @@ X-API-Token: 你的机器人密钥
 - `POST /api/admin/auth/login` 管理员登录
 - `GET /api/admin/profile` 获取当前管理员
 - `POST /api/admin/change-password` 修改密码
+- `GET /api/admin/update/status` 查看系统版本和更新状态
 
 ## 激活码 API
 
@@ -329,6 +332,7 @@ Compose 已包含：
 - 日志滚动：单个日志文件最大 20MB，最多保留 5 个。
 - `./数据:/app/data`：持久化网页初始化配置。
 - `.env` 支持：端口、绑定地址、时区、MySQL、JWT、机器人密钥都可配置。
+- 构建版本信息：支持通过 `APP_COMMIT` 和 `APP_VERSION` 写入当前镜像版本。
 
 常用命令：
 
@@ -370,11 +374,13 @@ WATCHPACK_POLLING: "true"
 ```bash
 cd Activation-Code-Backend
 git pull
-docker compose --progress plain -f docker-compose.dev.yml build
+APP_COMMIT=$(git rev-parse --short HEAD) docker compose --progress plain -f docker-compose.dev.yml build
 docker compose -f docker-compose.dev.yml up -d
 ```
 
 配置文件 `数据/系统配置.json` 不会被 Git 覆盖。
+
+后台“管理员设置”页面会显示当前构建提交、GitHub 最新提交和推荐更新命令。服务器项目目录不是 `/root/Activation-Code-Backend` 时，请在 `.env` 中修改 `UPDATE_WORKDIR`；私有仓库或 GitHub 限流时，可以设置 `GITHUB_TOKEN`。
 
 ## 本地开发
 

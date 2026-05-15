@@ -79,6 +79,30 @@ export interface 激活日志 {
   createdAt: string;
 }
 
+export interface 系统更新状态 {
+  repository: string;
+  branch: string;
+  current: {
+    version: string;
+    commit: string;
+    shortCommit: string;
+    buildTime: string | null;
+    source: string;
+  };
+  latest: {
+    commit: string;
+    shortCommit: string;
+    message: string;
+    author: string;
+    committedAt: string | null;
+    url: string;
+  } | null;
+  hasUpdate: boolean;
+  checkError: string | null;
+  checkedAt: string;
+  updateCommands: string[];
+}
+
 export const 卡类型文本: Record<卡类型, string> = {
   day: '日卡',
   three_days: '三天卡',
