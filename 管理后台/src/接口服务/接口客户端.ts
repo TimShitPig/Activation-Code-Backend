@@ -1,4 +1,4 @@
-const API_BASE = import.meta.env.VITE_API_BASE || 'http://localhost:7789/api';
+const API_BASE = import.meta.env.VITE_API_BASE || 'http://localhost:7790/api';
 
 interface 接口响应<T> {
   success: boolean;

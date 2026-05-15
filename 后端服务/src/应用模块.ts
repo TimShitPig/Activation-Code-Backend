@@ -1,5 +1,8 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
+import { ServeStaticModule } from '@nestjs/serve-static';
+import { existsSync } from 'fs';
+import { join } from 'path';
 import { 管理员认证模块 } from './管理员认证/管理员认证模块';
 import { 激活码管理模块 } from './激活码管理/激活码管理模块';
 import { 机器人接口模块 } from './机器人接口/机器人接口模块';
@@ -11,6 +14,12 @@ import { 系统设置模块 } from './系统设置/系统设置模块';
     ConfigModule.forRoot({
       isGlobal: true,
       envFilePath: ['.env', '../部署配置/.env.example', '部署配置/.env.example']
+    }),
+    ServeStaticModule.forRoot({
+      rootPath: join(process.cwd(), '管理后台', 'dist'),
+      exclude: ['/api*'],
+      serveRoot: '/',
+      renderPath: existsSync(join(process.cwd(), '管理后台', 'dist', 'index.html')) ? '*' : undefined
     }),
     系统设置模块,
     管理员认证模块,

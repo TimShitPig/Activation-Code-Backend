@@ -1,0 +1,8 @@
+node_modules
+**/node_modules
+**/dist
+.git
+数据
+*.log
+npm-debug.log*
+

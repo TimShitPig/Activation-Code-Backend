@@ -7,7 +7,7 @@
 - 全中文管理后台：登录、初始化、概览、激活码列表、日志中心、管理员设置。
 - 网页初始化：第一次部署后直接打开网页填写 MySQL、管理员账号、机器人密钥。
 - 远程 MySQL：不在 Docker 中内置数据库，适合连接云数据库或已有 MySQL。
-- Docker 一键启动：`docker compose -f docker-compose.dev.yml up -d --build`。
+- Docker 单容器启动：`docker compose -f docker-compose.dev.yml up -d --build`。
 - 实时业务更新：机器人激活后后台自动刷新显示已激活、有效中、剩余时间。
 - 到期状态展示：后台自动计算已到期、有效中和剩余时间。
 - 批量管理：批量禁用、启用、删除、导出 CSV。
@@ -68,13 +68,13 @@ docker compose -f docker-compose.dev.yml up -d --build
 启动后访问：
 
 ```text
-http://服务器IP:7788
+http://服务器IP:7790
 ```
 
 后端接口地址：
 
 ```text
-http://服务器IP:7789/api
+http://服务器IP:7790/api
 ```
 
 ## 第一次网页初始化
@@ -278,9 +278,22 @@ X-API-Token: 你的机器人密钥
 - `POST /api/setup/test-database` 测试数据库连接
 - `POST /api/setup/initialize` 保存初始化配置并创建数据表
 
-## Docker 热更新
+## Docker 单容器部署
 
-当前 `docker-compose.dev.yml` 使用源码挂载。注意：Compose 服务名使用英文 `backend` 和 `admin`，这样兼容服务器上的 Docker Compose 校验规则；项目目录仍然保持中文分类。
+当前 `docker-compose.dev.yml` 只启动一个容器 `app`：
+
+- 网页：`http://服务器IP:7790`
+- API：`http://服务器IP:7790/api`
+- 数据配置：`数据/系统配置.json`
+
+前端会在镜像构建时编译成静态文件，由后端 NestJS 同一个服务托管，不再单独启动 Vite 容器。
+
+本地开发仍可使用两个命令分开热更新：
+
+```powershell
+npm.cmd run dev -w 后端服务
+npm.cmd run dev -w 管理后台
+```
 
 Dockerfile 已设置 npm 镜像源：
 
@@ -324,7 +337,7 @@ npm.cmd run dev -w 管理后台
 访问：
 
 ```text
-http://localhost:7788
+http://localhost:7790
 ```
 
 ## 构建检查

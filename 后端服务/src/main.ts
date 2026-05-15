@@ -20,15 +20,15 @@ async function bootstrap() {
   app.useGlobalInterceptors(new 中文响应拦截器());
   app.useGlobalFilters(new 全局异常过滤器());
 
-  const corsOrigin = config.get<string>('CORS_ORIGIN') || 'http://localhost:7788';
+  const corsOrigin = config.get<string>('CORS_ORIGIN') || '*';
   app.enableCors({
-    origin: corsOrigin.split(',').map((item) => item.trim()),
+    origin: corsOrigin === '*' ? true : corsOrigin.split(',').map((item) => item.trim()),
     credentials: true
   });
 
-  const port = config.get<number>('PORT') || 7789;
+  const port = config.get<number>('PORT') || 7790;
   await app.listen(port);
-  console.log(`激活码后端服务已启动：http://localhost:${port}/api`);
+  console.log(`激活码系统已启动：http://localhost:${port}`);
 }
 
 bootstrap();
