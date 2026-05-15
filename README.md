@@ -134,6 +134,20 @@ CREATE DATABASE activation_system CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_
 
 如果你使用其他数据库名，网页初始化时填写对应名称即可。
 
+如果 MySQL 就安装在同一台服务器宿主机上，初始化页面的 MySQL 地址可以填写：
+
+```text
+127.0.0.1
+```
+
+当前 `docker-compose.dev.yml` 使用 `network_mode: host`，容器会和服务器宿主机共用网络，所以可以直接访问本机 MySQL。
+
+如果你改回 Docker 默认 bridge 网络，容器里的 `127.0.0.1` 才会变成容器自身。那种情况下需要改用：
+
+```text
+host.docker.internal
+```
+
 ## 管理后台功能
 
 ### 首页概览

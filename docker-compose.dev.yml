@@ -11,10 +11,9 @@ services:
       nofile:
         soft: 65535
         hard: 65535
+    network_mode: host
     volumes:
       - ./数据:/app/data
-    ports:
-      - "${BIND_HOST:-0.0.0.0}:${SERVER_PORT:-7790}:${PORT:-7790}"
     environment:
       NODE_ENV: "production"
       TZ: "${TZ:-Asia/Shanghai}"
@@ -48,9 +47,3 @@ services:
       options:
         max-size: "20m"
         max-file: "5"
-    networks:
-      - activation-code-network
-
-networks:
-  activation-code-network:
-    driver: bridge
