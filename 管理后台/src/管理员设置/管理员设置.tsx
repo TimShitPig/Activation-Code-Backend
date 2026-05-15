@@ -21,16 +21,6 @@ export function 管理员设置({ 管理员 }: { 管理员: 管理员信息 }) {
     加载更新状态();
   }, []);
 
-  useEffect(() => {
-    const task = 更新状态?.updateTask;
-    if (!task || (task.stage !== 'installing' && task.stage !== 'restarting')) return;
-
-    const timer = window.setInterval(() => {
-      加载更新状态();
-    }, 5000);
-    return () => window.clearInterval(timer);
-  }, [更新状态?.updateTask?.stage, 更新状态?.updateTask?.startedAt, 更新状态?.updateTask?.finishedAt]);
-
   async function 加载更新状态() {
     设置更新加载中(true);
     设置更新错误('');
@@ -160,7 +150,7 @@ export function 管理员设置({ 管理员 }: { 管理员: 管理员信息 }) {
               >
                 {自动更新按钮文本}
               </按钮>
-              <按钮 类型="次要" 图标={<RefreshCcw size={18} />} disabled={更新加载中 || 自动更新中 || 更新任务运行中} onClick={加载更新状态}>
+              <按钮 类型="次要" 图标={<RefreshCcw size={18} />} disabled={更新加载中} onClick={加载更新状态}>
                 {更新加载中 ? '检查中' : '重新检查'}
               </按钮>
             </div>
