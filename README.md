@@ -62,7 +62,7 @@ Activation-Code-Backend/
 ```bash
 git clone https://github.com/TimShitPig/Activation-Code-Backend.git
 cd Activation-Code-Backend
-docker compose -f docker-compose.dev.yml build --progress=plain
+docker compose --progress plain -f docker-compose.dev.yml build
 docker compose -f docker-compose.dev.yml up -d
 ```
 
@@ -87,13 +87,13 @@ cp 部署配置/.env.example .env
 然后编辑 `.env` 后再执行：
 
 ```bash
-docker compose -f docker-compose.dev.yml build --progress=plain
+docker compose --progress plain -f docker-compose.dev.yml build
 docker compose -f docker-compose.dev.yml up -d
 ```
 
 不复制 `.env` 也可以直接启动，第一次打开网页会进入初始化向导。
 
-`--progress=plain` 会把 Docker 构建进度改成普通文本输出，避免在部分终端里反复刷新同一批步骤。
+`--progress plain` 会把 Docker 构建进度改成普通文本输出，避免在部分终端里反复刷新同一批步骤。
 
 ## 第一次网页初始化
 
@@ -356,7 +356,7 @@ WATCHPACK_POLLING: "true"
 ```bash
 cd Activation-Code-Backend
 git pull
-docker compose -f docker-compose.dev.yml build --progress=plain
+docker compose --progress plain -f docker-compose.dev.yml build
 docker compose -f docker-compose.dev.yml up -d
 ```
 
