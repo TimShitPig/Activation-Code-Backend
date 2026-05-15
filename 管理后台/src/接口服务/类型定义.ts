@@ -82,6 +82,8 @@ export interface 激活日志 {
 export interface 系统更新状态 {
   repository: string;
   branch: string;
+  githubSource: string | null;
+  githubSources: string[];
   current: {
     version: string;
     commit: string;

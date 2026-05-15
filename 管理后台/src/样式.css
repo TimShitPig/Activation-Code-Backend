@@ -1,7 +1,37 @@
 :root {
   font-family: "Microsoft YaHei", "PingFang SC", system-ui, sans-serif;
   color: #172033;
-  background: #f6f7fb;
+  background: #f7f9fc;
+  --颜色-背景: #f7f9fc;
+  --颜色-表面: #ffffff;
+  --颜色-表面弱: #f9fbfd;
+  --颜色-表面选中: #edf4ff;
+  --颜色-文字: #172033;
+  --颜色-次要文字: #607089;
+  --颜色-弱文字: #8792a5;
+  --颜色-边框: #dce3ee;
+  --颜色-弱边框: #e8edf5;
+  --颜色-主色: #1868db;
+  --颜色-主色悬停: #1558bc;
+  --颜色-主色按下: #0c3b8f;
+  --颜色-主色弱背景: #e9f2ff;
+  --颜色-侧栏背景: #101827;
+  --颜色-侧栏表面: #182235;
+  --颜色-侧栏选中: #223149;
+  --颜色-侧栏文字: #e7edf8;
+  --颜色-侧栏弱文字: #a9b4c5;
+  --颜色-成功: #1f845a;
+  --颜色-成功文字: #216e4e;
+  --颜色-成功背景: #eaf8f1;
+  --颜色-警告: #b25e09;
+  --颜色-警告背景: #fff3dc;
+  --颜色-危险: #c9372c;
+  --颜色-危险悬停: #ae2e24;
+  --颜色-危险背景: #ffebe6;
+  --颜色-信息: #1558bc;
+  --颜色-信息背景: #e9f2ff;
+  --阴影-浮层: 0 12px 28px rgba(20, 32, 51, 0.07);
+  --阴影-弹窗: 0 24px 80px rgba(16, 24, 39, 0.28);
   font-synthesis: none;
   text-rendering: optimizeLegibility;
 }
@@ -13,6 +43,7 @@
 body {
   margin: 0;
   min-width: 320px;
+  background: var(--颜色-背景);
 }
 
 button,
@@ -82,11 +113,11 @@ button:disabled {
 .登录面板,
 .初始化面板 {
   width: min(440px, calc(100vw - 32px));
-  background: #ffffff;
-  border: 1px solid #e5e7eb;
+  background: var(--颜色-表面);
+  border: 1px solid var(--颜色-弱边框);
   border-radius: 8px;
   padding: 28px;
-  box-shadow: 0 24px 80px rgba(15, 23, 42, 0.28);
+  box-shadow: var(--阴影-弹窗);
   animation: 面板进入 360ms cubic-bezier(0.2, 0.9, 0.2, 1);
 }
 
@@ -127,7 +158,7 @@ button:disabled {
 
 .登录标识 p,
 .页面标题 p {
-  color: #65758b;
+  color: var(--颜色-次要文字);
   margin: 6px 0 0;
 }
 
@@ -139,8 +170,8 @@ button:disabled {
 }
 
 .侧边栏 {
-  background: #111827;
-  color: #eef2ff;
+  background: var(--颜色-侧栏背景);
+  color: var(--颜色-侧栏文字);
   padding: 18px;
   display: flex;
   flex-direction: column;
@@ -159,7 +190,7 @@ button:disabled {
 .品牌区 span,
 .管理员卡片 span {
   display: block;
-  color: #9ca3af;
+  color: var(--颜色-侧栏弱文字);
   font-size: 12px;
   margin-top: 3px;
 }
@@ -171,7 +202,7 @@ button:disabled {
   display: grid;
   place-items: center;
   color: #fff;
-  background: #2563eb;
+  background: var(--颜色-主色);
   border-radius: 8px;
 }
 
@@ -189,7 +220,7 @@ button:disabled {
   border: 0;
   border-radius: 8px;
   padding: 11px 12px;
-  color: #d1d5db;
+  color: var(--颜色-侧栏弱文字);
   background: transparent;
   text-align: left;
   transform: translateX(0);
@@ -199,8 +230,8 @@ button:disabled {
 .导航项:hover,
 .退出按钮:hover,
 .当前导航 {
-  background: #1f2937;
-  color: #ffffff;
+  background: var(--颜色-侧栏选中);
+  color: var(--颜色-侧栏文字);
   transform: translateX(3px);
 }
 
@@ -211,16 +242,16 @@ button:disabled {
 }
 
 .管理员卡片 {
-  border: 1px solid #374151;
+  border: 1px solid rgba(169, 180, 197, 0.22);
   border-radius: 8px;
   padding: 12px;
-  background: #172033;
+  background: var(--颜色-侧栏表面);
   transition: border-color 180ms ease, background-color 180ms ease;
 }
 
 .管理员卡片:hover {
-  border-color: #4b5563;
-  background: #1f2937;
+  border-color: rgba(169, 180, 197, 0.42);
+  background: var(--颜色-侧栏选中);
 }
 
 .内容区 {
@@ -300,61 +331,61 @@ button:disabled {
 }
 
 .按钮-主要 {
-  background: #2563eb;
+  background: var(--颜色-主色);
   color: #fff;
 }
 
 .按钮-主要:hover {
-  background: #1d4ed8;
+  background: var(--颜色-主色悬停);
 }
 
 .按钮-次要 {
-  background: #fff;
-  border-color: #d7dce5;
-  color: #172033;
+  background: var(--颜色-表面);
+  border-color: var(--颜色-边框);
+  color: var(--颜色-文字);
 }
 
 .按钮-次要:hover,
 .按钮-幽灵:hover {
-  background: #eef4ff;
-  border-color: #b9c7dc;
+  background: var(--颜色-主色弱背景);
+  border-color: #b8c9e6;
 }
 
 .按钮-危险 {
-  background: #dc2626;
+  background: var(--颜色-危险);
   color: #fff;
 }
 
 .按钮-危险:hover {
-  background: #b91c1c;
+  background: var(--颜色-危险悬停);
 }
 
 .按钮-幽灵 {
   background: transparent;
-  color: #42526b;
+  color: var(--颜色-次要文字);
 }
 
 .表单项 {
   display: grid;
   gap: 7px;
   font-size: 13px;
-  color: #42526b;
+  color: var(--颜色-次要文字);
 }
 
 .输入框 {
   height: 38px;
-  border: 1px solid #d7dce5;
+  border: 1px solid var(--颜色-边框);
   border-radius: 8px;
   padding: 0 11px;
-  background: #fff;
-  color: #172033;
+  background: var(--颜色-表面);
+  color: var(--颜色-文字);
   outline: none;
   transition: border-color 180ms ease, box-shadow 180ms ease, background-color 180ms ease;
 }
 
 .输入框:focus {
-  border-color: #2563eb;
-  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.14);
+  border-color: var(--颜色-主色);
+  box-shadow: 0 0 0 3px rgba(24, 104, 219, 0.14);
 }
 
 .筛选栏 {
@@ -363,8 +394,8 @@ button:disabled {
   gap: 12px;
   align-items: end;
   padding: 14px;
-  background: #fff;
-  border: 1px solid #e5e7eb;
+  background: var(--颜色-表面);
+  border: 1px solid var(--颜色-弱边框);
   border-radius: 8px;
   animation: 面板进入 260ms ease-out;
 }
@@ -377,16 +408,16 @@ button:disabled {
 
 .统计卡,
 .信息区块 {
-  background: #fff;
-  border: 1px solid #e5e7eb;
+  background: var(--颜色-表面);
+  border: 1px solid var(--颜色-弱边框);
   border-radius: 8px;
   transition: border-color 180ms ease, box-shadow 180ms ease, transform 180ms ease;
 }
 
 .统计卡:hover,
 .信息区块:hover {
-  border-color: #d7dce5;
-  box-shadow: 0 12px 28px rgba(15, 23, 42, 0.06);
+  border-color: var(--颜色-边框);
+  box-shadow: var(--阴影-浮层);
   transform: translateY(-1px);
 }
 
@@ -417,7 +448,7 @@ button:disabled {
 }
 
 .统计卡 span {
-  color: #65758b;
+  color: var(--颜色-次要文字);
   font-size: 13px;
 }
 
@@ -426,12 +457,12 @@ button:disabled {
   letter-spacing: 0;
 }
 
-.统计-绿 .统计图标 { background: #059669; }
-.统计-橙 .统计图标 { background: #ea580c; }
-.统计-红 .统计图标 { background: #dc2626; }
-.统计-青 .统计图标 { background: #0891b2; }
-.统计-蓝 .统计图标 { background: #2563eb; }
-.统计-紫 .统计图标 { background: #7c3aed; }
+.统计-绿 .统计图标 { background: #1f845a; }
+.统计-橙 .统计图标 { background: #b25e09; }
+.统计-红 .统计图标 { background: var(--颜色-危险); }
+.统计-青 .统计图标 { background: #0c7894; }
+.统计-蓝 .统计图标 { background: var(--颜色-主色); }
+.统计-紫 .统计图标 { background: #6e5dc6; }
 
 .信息区块 {
   padding: 18px;
@@ -473,30 +504,30 @@ button:disabled {
 .详情列表 div {
   display: grid;
   gap: 5px;
-  border: 1px solid #e5e7eb;
+  border: 1px solid var(--颜色-弱边框);
   border-radius: 8px;
   padding: 12px;
-  background: #fafafa;
+  background: var(--颜色-表面弱);
   transition: border-color 180ms ease, background-color 180ms ease, transform 180ms ease;
 }
 
 .流程网格 div:hover,
 .详情列表 div:hover {
-  border-color: #d7dce5;
-  background: #ffffff;
+  border-color: var(--颜色-边框);
+  background: var(--颜色-表面);
   transform: translateY(-1px);
 }
 
 .流程网格 span,
 .详情列表 span {
-  color: #65758b;
+  color: var(--颜色-次要文字);
   font-size: 13px;
 }
 
 .表格外框 {
   overflow-x: auto;
-  background: #fff;
-  border: 1px solid #e5e7eb;
+  background: var(--颜色-表面);
+  border: 1px solid var(--颜色-弱边框);
   border-radius: 8px;
   animation: 面板进入 260ms ease-out;
 }
@@ -510,20 +541,20 @@ button:disabled {
 
 .数据表格 th,
 .数据表格 td {
-  border-bottom: 1px solid #eef1f5;
+  border-bottom: 1px solid var(--颜色-弱边框);
   padding: 11px 12px;
   text-align: left;
   white-space: nowrap;
 }
 
 .数据表格 th {
-  color: #526179;
-  background: #f8fafc;
+  color: var(--颜色-次要文字);
+  background: var(--颜色-表面弱);
   font-weight: 600;
 }
 
 .数据表格 tr:hover td {
-  background: #f8fbff;
+  background: var(--颜色-表面选中);
 }
 
 .数据表格 td {
@@ -568,20 +599,20 @@ button:disabled {
 }
 
 .到期标签 {
-  background: #fef2f2;
-  color: #991b1b;
+  background: var(--颜色-危险背景);
+  color: var(--颜色-危险);
 }
 
 .有效标签 {
-  background: #ecfeff;
-  color: #0e7490;
+  background: #e7f8fb;
+  color: #0c7894;
 }
 
-.状态-unused { background: #eff6ff; color: #1d4ed8; }
-.状态-activated { background: #ecfdf5; color: #047857; }
-.状态-partial { background: #fff7ed; color: #c2410c; }
-.状态-disabled { background: #fef2f2; color: #b91c1c; }
-.状态-deleted { background: #f3f4f6; color: #4b5563; }
+.状态-unused { background: var(--颜色-信息背景); color: var(--颜色-信息); }
+.状态-activated { background: var(--颜色-成功背景); color: var(--颜色-成功文字); }
+.状态-partial { background: var(--颜色-警告背景); color: var(--颜色-警告); }
+.状态-disabled { background: var(--颜色-危险背景); color: var(--颜色-危险); }
+.状态-deleted { background: #f1f4f8; color: #56657a; }
 
 .行操作 {
   display: flex;
@@ -591,8 +622,8 @@ button:disabled {
 .行操作 button,
 .标签栏 button,
 .分页栏 button {
-  border: 1px solid #d7dce5;
-  background: #fff;
+  border: 1px solid var(--颜色-边框);
+  background: var(--颜色-表面);
   border-radius: 7px;
   min-height: 32px;
   padding: 0 10px;
@@ -602,20 +633,20 @@ button:disabled {
 .行操作 button:not(:disabled):hover,
 .标签栏 button:not(:disabled):hover,
 .分页栏 button:not(:disabled):hover {
-  background: #eef4ff;
-  border-color: #b9c7dc;
+  background: var(--颜色-主色弱背景);
+  border-color: #b8c9e6;
   transform: translateY(-1px);
 }
 
 .危险文字 {
-  color: #dc2626;
+  color: var(--颜色-危险);
 }
 
 .批量栏,
 .分页栏 {
   padding: 12px 14px;
-  background: #fff;
-  border: 1px solid #e5e7eb;
+  background: var(--颜色-表面);
+  border: 1px solid var(--颜色-弱边框);
   border-radius: 8px;
   animation: 面板进入 240ms ease-out;
 }
@@ -637,11 +668,11 @@ button:disabled {
 
 .弹窗 {
   width: min(760px, 100%);
-  background: #fff;
+  background: var(--颜色-表面);
   border-radius: 8px;
   padding: 20px;
-  border: 1px solid #e5e7eb;
-  box-shadow: 0 22px 70px rgba(15, 23, 42, 0.28);
+  border: 1px solid var(--颜色-弱边框);
+  box-shadow: var(--阴影-弹窗);
   animation: 面板进入 260ms cubic-bezier(0.2, 0.9, 0.2, 1);
 }
 
@@ -657,23 +688,23 @@ button:disabled {
 }
 
 .弹窗标题 p {
-  color: #65758b;
+  color: var(--颜色-次要文字);
   margin: 5px 0 0;
 }
 
 .关闭按钮 {
   width: 34px;
   height: 34px;
-  border: 1px solid #d7dce5;
-  background: #fff;
+  border: 1px solid var(--颜色-边框);
+  background: var(--颜色-表面);
   border-radius: 8px;
   font-size: 22px;
   transition: background-color 160ms ease, border-color 160ms ease, transform 160ms ease;
 }
 
 .关闭按钮:hover {
-  background: #eef4ff;
-  border-color: #b9c7dc;
+  background: var(--颜色-主色弱背景);
+  border-color: #b8c9e6;
   transform: rotate(8deg);
 }
 
@@ -692,20 +723,20 @@ button:disabled {
 }
 
 .错误提示 {
-  background: #fef2f2;
-  border: 1px solid #fecaca;
-  color: #991b1b;
+  background: var(--颜色-危险背景);
+  border: 1px solid #ffc8bd;
+  color: var(--颜色-危险);
 }
 
 .成功提示 {
-  background: #ecfdf5;
-  border: 1px solid #bbf7d0;
-  color: #047857;
+  background: var(--颜色-成功背景);
+  border: 1px solid #bce8d0;
+  color: var(--颜色-成功文字);
 }
 
 .空状态 {
   padding: 34px;
-  color: #65758b;
+  color: var(--颜色-次要文字);
   text-align: center;
 }
 
@@ -714,9 +745,9 @@ button:disabled {
 }
 
 .标签栏 .当前标签 {
-  background: #111827;
+  background: var(--颜色-侧栏背景);
   color: #fff;
-  border-color: #111827;
+  border-color: var(--颜色-侧栏背景);
 }
 
 .设置网格 {
@@ -736,7 +767,7 @@ button:disabled {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  color: #2563eb;
+  color: var(--颜色-主色);
   text-decoration: none;
   font-weight: 700;
 }
@@ -750,10 +781,10 @@ button:disabled {
   display: flex;
   gap: 12px;
   align-items: center;
-  border: 1px solid #d7dce5;
+  border: 1px solid var(--颜色-边框);
   border-radius: 8px;
   padding: 14px;
-  background: #f8fafc;
+  background: var(--颜色-表面弱);
   animation: 提示进入 240ms ease-out;
   transition: border-color 180ms ease, background-color 180ms ease, transform 180ms ease;
 }
@@ -768,27 +799,27 @@ button:disabled {
 }
 
 .更新状态条 span {
-  color: #65758b;
+  color: var(--颜色-次要文字);
   font-size: 13px;
   margin-top: 4px;
 }
 
 .更新状态条.有更新 {
-  border-color: #fed7aa;
-  background: #fff7ed;
-  color: #c2410c;
+  border-color: #f4c27a;
+  background: var(--颜色-警告背景);
+  color: var(--颜色-警告);
 }
 
 .更新状态条.已最新 {
-  border-color: #bbf7d0;
-  background: #ecfdf5;
-  color: #047857;
+  border-color: #bce8d0;
+  background: var(--颜色-成功背景);
+  color: var(--颜色-成功文字);
 }
 
 .更新状态条.检查失败 {
-  border-color: #fecaca;
-  background: #fef2f2;
-  color: #b91c1c;
+  border-color: #ffc8bd;
+  background: var(--颜色-危险背景);
+  color: var(--颜色-危险);
 }
 
 .更新摘要 {
@@ -800,21 +831,21 @@ button:disabled {
 .更新摘要 div {
   display: grid;
   gap: 5px;
-  border: 1px solid #e5e7eb;
+  border: 1px solid var(--颜色-弱边框);
   border-radius: 8px;
   padding: 12px;
-  background: #fafafa;
+  background: var(--颜色-表面弱);
   transition: border-color 180ms ease, background-color 180ms ease, transform 180ms ease;
 }
 
 .更新摘要 div:hover {
-  border-color: #d7dce5;
-  background: #ffffff;
+  border-color: var(--颜色-边框);
+  background: var(--颜色-表面);
   transform: translateY(-1px);
 }
 
 .更新摘要 span {
-  color: #65758b;
+  color: var(--颜色-次要文字);
   font-size: 13px;
 }
 
@@ -828,15 +859,15 @@ button:disabled {
 }
 
 .更新命令区 {
-  border: 1px solid #e5e7eb;
+  border: 1px solid var(--颜色-弱边框);
   border-radius: 8px;
   padding: 14px;
-  background: #fafafa;
+  background: var(--颜色-表面弱);
   transition: border-color 180ms ease, box-shadow 180ms ease;
 }
 
 .更新命令区:hover {
-  border-color: #d7dce5;
+  border-color: var(--颜色-边框);
   box-shadow: 0 10px 24px rgba(15, 23, 42, 0.05);
 }
 
@@ -845,8 +876,8 @@ button:disabled {
   overflow-x: auto;
   border-radius: 8px;
   padding: 12px;
-  background: #111827;
-  color: #e5e7eb;
+  background: var(--颜色-侧栏背景);
+  color: var(--颜色-侧栏文字);
   font-family: "Cascadia Mono", "Fira Code", monospace;
   font-size: 13px;
   line-height: 1.7;
@@ -855,10 +886,10 @@ button:disabled {
 .更新任务提示 {
   display: grid;
   gap: 10px;
-  border: 1px solid #d7dce5;
+  border: 1px solid var(--颜色-边框);
   border-radius: 8px;
   padding: 12px;
-  background: #f8fafc;
+  background: var(--颜色-表面弱);
   animation: 提示进入 240ms ease-out;
   transition: border-color 180ms ease, background-color 180ms ease, transform 180ms ease;
   position: relative;
@@ -875,14 +906,14 @@ button:disabled {
 }
 
 .更新任务提示 span {
-  color: #65758b;
+  color: var(--颜色-次要文字);
   font-size: 13px;
   margin-top: 4px;
 }
 
 .更新任务提示.任务进行中 {
-  border-color: #bfdbfe;
-  background: #eff6ff;
+  border-color: #b8c9e6;
+  background: var(--颜色-信息背景);
 }
 
 .更新任务提示.任务进行中::before {
@@ -902,13 +933,13 @@ button:disabled {
 }
 
 .更新任务提示.任务完成 {
-  border-color: #bbf7d0;
-  background: #ecfdf5;
+  border-color: #bce8d0;
+  background: var(--颜色-成功背景);
 }
 
 .更新任务提示.任务失败 {
-  border-color: #fecaca;
-  background: #fef2f2;
+  border-color: #ffc8bd;
+  background: var(--颜色-危险背景);
 }
 
 .更新任务详情 {

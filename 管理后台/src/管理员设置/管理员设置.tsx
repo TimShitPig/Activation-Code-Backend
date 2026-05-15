@@ -184,7 +184,7 @@ export function 管理员设置({ 管理员 }: { 管理员: 管理员信息 }) {
                 <div>
                   <strong>{更新状态.checkError ? '无法确认最新版本' : 更新状态.hasUpdate ? '发现可更新版本' : '当前已经是最新版本'}</strong>
                   <span>
-                    仓库 {更新状态.repository}，分支 {更新状态.branch}，检查时间 {格式时间(更新状态.checkedAt)}
+                    仓库 {更新状态.repository}，分支 {更新状态.branch}，访问源 {更新状态.githubSource || '未确认'}，检查时间 {格式时间(更新状态.checkedAt)}
                   </span>
                 </div>
               </div>

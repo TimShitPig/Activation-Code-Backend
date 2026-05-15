@@ -27,6 +27,12 @@ interface GitHub提交响应 {
   };
 }
 
+interface GitHub访问源 {
+  name: string;
+  type: 'api' | 'proxy';
+  baseUrl: string;
+}
+
 export type 更新任务阶段 = 'installing' | 'installed' | 'restarting' | 'completed' | 'failed';
 
 export interface 更新任务状态 {
@@ -51,6 +57,7 @@ export class 系统更新服务 {
     const branch = this.config.get<string>('UPDATE_BRANCH') || 'main';
     const current = this.读取当前版本();
     const checkedAt = new Date().toISOString();
+    const sources = this.读取GitHub访问源();
 
     try {
       const latest = await this.读取GitHub最新提交(repository, branch);
@@ -58,6 +65,8 @@ export class 系统更新服务 {
       return {
         repository,
         branch,
+        githubSources: sources.map((source) => source.name),
+        githubSource: latest.sourceName,
         current,
         latest,
         hasUpdate,
@@ -70,6 +79,8 @@ export class 系统更新服务 {
       return {
         repository,
         branch,
+        githubSources: sources.map((source) => source.name),
+        githubSource: null,
         current,
         latest: null,
         hasUpdate: false,
@@ -211,31 +222,44 @@ export class 系统更新服务 {
   }
 
   private async 读取GitHub最新提交(repository: string, branch: string) {
-    const url = `https://api.github.com/repos/${repository}/commits/${encodeURIComponent(branch)}`;
+    const sources = this.读取GitHub访问源();
     const token = this.config.get<string>('GITHUB_TOKEN');
-    const response = await fetch(url, {
-      headers: {
-        Accept: 'application/vnd.github+json',
-        'User-Agent': 'activation-code-backend-update-checker',
-        ...(token ? { Authorization: `Bearer ${token}` } : {})
-      }
-    });
+    const errors: string[] = [];
 
-    if (!response.ok) {
-      throw new Error(`GitHub 返回 ${response.status}，无法读取最新版本`);
+    for (const source of sources) {
+      const url = this.创建GitHub提交接口地址(source, repository, branch);
+      try {
+        const response = await fetch(url, {
+          headers: {
+            Accept: 'application/vnd.github+json',
+            'User-Agent': 'activation-code-backend-update-checker',
+            ...(token && source.type === 'api' ? { Authorization: `Bearer ${token}` } : {})
+          }
+        });
+
+        if (!response.ok) {
+          errors.push(`${source.name} 返回 ${response.status}`);
+          continue;
+        }
+
+        const data = (await response.json()) as GitHub提交响应;
+        const committedAt = data.commit.committer?.date || data.commit.author?.date || null;
+
+        return {
+          commit: data.sha,
+          shortCommit: this.短提交(data.sha),
+          message: data.commit.message.split('\n')[0],
+          author: data.commit.author?.name || data.commit.committer?.name || '',
+          committedAt,
+          url: data.html_url,
+          sourceName: source.name
+        };
+      } catch (error) {
+        errors.push(`${source.name} ${error instanceof Error ? error.message : String(error)}`);
+      }
     }
 
-    const data = (await response.json()) as GitHub提交响应;
-    const committedAt = data.commit.committer?.date || data.commit.author?.date || null;
-
-    return {
-      commit: data.sha,
-      shortCommit: this.短提交(data.sha),
-      message: data.commit.message.split('\n')[0],
-      author: data.commit.author?.name || data.commit.committer?.name || '',
-      committedAt,
-      url: data.html_url
-    };
+    throw new Error(`无法读取最新版本：${errors.join('；')}`);
   }
 
   private 判断是否有新版本(
@@ -314,7 +338,7 @@ export class 系统更新服务 {
 
   private 安装命令() {
     return [
-      'git pull',
+      this.创建Git拉取命令(),
       'APP_COMMIT=$(git rev-parse --short HEAD) docker compose -f docker-compose.dev.yml build --no-cache'
     ];
   }
@@ -459,7 +483,7 @@ export class 系统更新服务 {
       '  set -eu',
       `  echo ${this.Shell单引号(`==== ${title}开始 ====`)}`,
       '  date -Iseconds',
-      ...commands.map((command) => `  ${command}`),
+      ...commands.flatMap((command) => this.缩进Shell命令(command)),
       `  echo ${this.Shell单引号(`==== ${title}完成 ====`)}`,
       '  date -Iseconds',
       `) >> ${this.Shell单引号(logFile)} 2>&1`
@@ -475,7 +499,7 @@ export class 系统更新服务 {
       '  set -eu',
       '  echo "==== 重启服务开始 ===="',
       '  date -Iseconds',
-      ...commands.map((command) => `  ${command}`),
+      ...commands.flatMap((command) => this.缩进Shell命令(command)),
       '  echo "==== 重启服务完成 ===="',
       '  date -Iseconds',
       `) >> ${this.Shell单引号(logFile)} 2>&1`,
@@ -510,6 +534,10 @@ export class 系统更新服务 {
     ].join('\n');
   }
 
+  private 缩进Shell命令(command: string) {
+    return command.split('\n').map((line) => `  ${line}`);
+  }
+
   private 创建重启助手命令(workdir: string, logFile: string, script: string) {
     const helperScript = resolve(dirname(logFile), `restart-helper-${Date.now()}.sh`);
     writeFileSync(helperScript, script, 'utf-8');
@@ -527,6 +555,69 @@ export class 系统更新服务 {
       this.Shell单引号(helperImage),
       this.Shell单引号(helperScript)
     ].join(' ');
+  }
+
+  private 读取GitHub访问源(): GitHub访问源[] {
+    const officialApi = this.config.get<string>('GITHUB_API_BASE') || 'https://api.github.com';
+    const proxyConfig = this.config.get<string>('GITHUB_PROXY_BASES')
+      || 'https://edgeone.gh-proxy.com,https://hk.gh-proxy.com,https://gh-proxy.com,https://gh.llkk.cc';
+    const proxies = proxyConfig
+      .split(',')
+      .map((item) => item.trim())
+      .filter(Boolean)
+      .map((baseUrl): GitHub访问源 => ({
+        name: baseUrl,
+        type: 'proxy',
+        baseUrl
+      }));
+
+    return [
+      { name: 'GitHub 官方', type: 'api', baseUrl: officialApi },
+      ...proxies
+    ];
+  }
+
+  private 创建GitHub提交接口地址(source: GitHub访问源, repository: string, branch: string) {
+    if (source.type === 'api') {
+      return `${this.去掉结尾斜杠(source.baseUrl)}/repos/${repository}/commits/${encodeURIComponent(branch)}`;
+    }
+    const apiUrl = `https://api.github.com/repos/${repository}/commits/${encodeURIComponent(branch)}`;
+    return this.拼接代理地址(source.baseUrl, apiUrl);
+  }
+
+  private 创建Git拉取命令() {
+    const sourceUrls = this.读取GitHub拉取地址().map((url) => this.Shell单引号(url)).join(' ');
+    return [
+      'current_remote=$(git remote get-url origin)',
+      'for remote_url in "$current_remote" ' + sourceUrls + '; do',
+      '  echo "尝试拉取：$remote_url"',
+      '  if git pull "$remote_url" HEAD; then',
+      '    break',
+      '  fi',
+      'done',
+      'git rev-parse --verify HEAD >/dev/null'
+    ].join('\n');
+  }
+
+  private 读取GitHub拉取地址() {
+    const repository = this.config.get<string>('UPDATE_REPOSITORY') || 'TimShitPig/Activation-Code-Backend';
+    const officialGitUrl = this.config.get<string>('UPDATE_GIT_URL') || `https://github.com/${repository}.git`;
+    const proxies = this.读取GitHub访问源()
+      .filter((source) => source.type === 'proxy')
+      .map((source) => this.拼接代理地址(source.baseUrl, officialGitUrl));
+    return [officialGitUrl, ...proxies];
+  }
+
+  private 拼接代理地址(proxyBase: string, targetUrl: string) {
+    return `${this.确保结尾斜杠(proxyBase)}${targetUrl}`;
+  }
+
+  private 去掉结尾斜杠(value: string) {
+    return value.replace(/\/+$/, '');
+  }
+
+  private 确保结尾斜杠(value: string) {
+    return `${this.去掉结尾斜杠(value)}/`;
   }
 
   private 短提交(commit: string) {
