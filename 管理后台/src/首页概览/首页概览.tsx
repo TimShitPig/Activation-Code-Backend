@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Activity, Ban, CheckCircle2, Clock3, KeyRound, Users } from 'lucide-react';
+import { Activity, Ban, CheckCircle2, Clock3, Hourglass, KeyRound, TimerOff, Users } from 'lucide-react';
 import { 请求 } from '../接口服务/接口客户端';
 import { 激活码统计 } from '../接口服务/类型定义';
 
@@ -8,13 +8,20 @@ export function 首页概览() {
   const [错误, 设置错误] = useState('');
 
   useEffect(() => {
-    请求<激活码统计>('/admin/codes/stats').then(设置统计).catch((error) => 设置错误(error.message));
+    function 加载() {
+      请求<激活码统计>('/admin/codes/stats').then(设置统计).catch((error) => 设置错误(error.message));
+    }
+    加载();
+    const timer = window.setInterval(加载, 5000);
+    return () => window.clearInterval(timer);
   }, []);
 
   const cards = [
     { label: '激活码总数', value: 统计?.total ?? '-', icon: <KeyRound />, tone: '紫' },
     { label: '未使用', value: 统计?.unused ?? '-', icon: <Clock3 />, tone: '蓝' },
     { label: '已激活', value: 统计?.activated ?? '-', icon: <CheckCircle2 />, tone: '绿' },
+    { label: '有效中', value: 统计?.activeNow ?? '-', icon: <Hourglass />, tone: '青' },
+    { label: '已到期', value: 统计?.expired ?? '-', icon: <TimerOff />, tone: '红' },
     { label: '部分使用', value: 统计?.partial ?? '-', icon: <Users />, tone: '橙' },
     { label: '已禁用', value: 统计?.disabled ?? '-', icon: <Ban />, tone: '红' },
     { label: '今日激活', value: 统计?.todayActivated ?? '-', icon: <Activity />, tone: '青' }
@@ -58,4 +65,3 @@ export function 首页概览() {
     </section>
   );
 }
-

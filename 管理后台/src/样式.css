@@ -40,13 +40,32 @@ button:disabled {
     radial-gradient(circle at top left, rgba(53, 162, 235, 0.2), transparent 32%);
 }
 
-.登录面板 {
+.登录面板,
+.初始化面板 {
   width: min(440px, calc(100vw - 32px));
   background: #ffffff;
   border: 1px solid #e5e7eb;
   border-radius: 8px;
   padding: 28px;
   box-shadow: 0 24px 80px rgba(15, 23, 42, 0.28);
+}
+
+.初始化面板 {
+  width: min(860px, calc(100vw - 32px));
+}
+
+.初始化分区 {
+  display: grid;
+  gap: 12px;
+  margin-top: 18px;
+}
+
+.初始化分区 h2 {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  margin: 0;
+  font-size: 16px;
 }
 
 .登录标识 {
@@ -383,6 +402,33 @@ button:disabled {
   font-weight: 600;
 }
 
+.状态组合 {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+}
+
+.到期标签,
+.有效标签 {
+  display: inline-flex;
+  align-items: center;
+  min-height: 24px;
+  border-radius: 999px;
+  padding: 0 9px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.到期标签 {
+  background: #fef2f2;
+  color: #991b1b;
+}
+
+.有效标签 {
+  background: #ecfeff;
+  color: #0e7490;
+}
+
 .状态-unused { background: #eff6ff; color: #1d4ed8; }
 .状态-activated { background: #ecfdf5; color: #047857; }
 .状态-partial { background: #fff7ed; color: #c2410c; }
@@ -559,4 +605,3 @@ button:disabled {
     padding: 20px;
   }
 }
-

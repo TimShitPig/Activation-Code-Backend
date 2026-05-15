@@ -1,16 +1,16 @@
 import { Injectable, UnauthorizedException } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
 import { PassportStrategy } from '@nestjs/passport';
 import { ExtractJwt, Strategy } from 'passport-jwt';
 import { 当前管理员 } from './当前管理员';
+import { 系统配置服务 } from '../系统设置/系统配置服务';
 
 @Injectable()
 export class JWT策略 extends PassportStrategy(Strategy, 'jwt') {
-  constructor(config: ConfigService) {
+  constructor(系统配置服务: 系统配置服务) {
     super({
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
       ignoreExpiration: false,
-      secretOrKey: config.get<string>('JWT_SECRET') || 'please_change_this_secret'
+      secretOrKey: 系统配置服务.读取JWT密钥()
     });
   }
 
@@ -24,4 +24,3 @@ export class JWT策略 extends PassportStrategy(Strategy, 'jwt') {
     };
   }
 }
-

@@ -1,6 +1,4 @@
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
-import { DataSource, Repository } from 'typeorm';
 import {
   激活码状态枚举,
   日志结果枚举,
@@ -13,6 +11,7 @@ import { 操作日志服务 } from '../操作日志/操作日志服务';
 import { 增加天数 } from '../激活码管理/激活码工具';
 import { 激活请求 } from './激活请求';
 import { 校验请求 } from './校验请求';
+import { 数据库连接服务 } from '../系统设置/数据库连接服务';
 
 interface 请求环境 {
   ip: string;
@@ -22,13 +21,7 @@ interface 请求环境 {
 @Injectable()
 export class 机器人接口服务 {
   constructor(
-    @InjectRepository(激活码实体)
-    private readonly 激活码仓库: Repository<激活码实体>,
-    @InjectRepository(兑换记录实体)
-    private readonly 兑换记录仓库: Repository<兑换记录实体>,
-    @InjectRepository(会员有效期实体)
-    private readonly 会员仓库: Repository<会员有效期实体>,
-    private readonly dataSource: DataSource,
+    private readonly 数据库连接服务: 数据库连接服务,
     private readonly 操作日志服务: 操作日志服务
   ) {}
 
@@ -38,7 +31,8 @@ export class 机器人接口服务 {
     const codeText = dto.code.trim().toUpperCase();
 
     try {
-      const result = await this.dataSource.transaction(async (manager) => {
+      const dataSource = await this.数据库连接服务.获取数据源();
+      const result = await dataSource.transaction(async (manager) => {
         const code = await manager.findOne(激活码实体, {
           where: { code: codeText },
           lock: { mode: 'pessimistic_write' }
@@ -154,7 +148,8 @@ export class 机器人接口服务 {
   async 校验(dto: 校验请求, env: 请求环境) {
     const subjectType = dto.subjectType || 'qq';
     const subjectId = dto.subjectId.trim();
-    const membership = await this.会员仓库.findOne({ where: { subjectType, subjectId } });
+    const 会员仓库 = await this.数据库连接服务.获取仓库(会员有效期实体);
+    const membership = await 会员仓库.findOne({ where: { subjectType, subjectId } });
     const now = new Date();
     const active = !!membership && membership.expiresAt > now;
     const message = active ? '会员有效' : '会员已过期或未激活';
@@ -179,4 +174,3 @@ export class 机器人接口服务 {
     };
   }
 }
-

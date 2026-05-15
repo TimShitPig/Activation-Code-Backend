@@ -24,6 +24,10 @@ export interface 激活码 {
   boundSubjectId: string | null;
   remark: string | null;
   createdAt: string;
+  isExpired?: boolean;
+  isActiveNow?: boolean;
+  remainingSeconds?: number | null;
+  realtimeStatusText?: string;
   batch?: {
     id: number;
     batchName: string;
@@ -35,6 +39,7 @@ export interface 分页结果<T> {
   total: number;
   page: number;
   pageSize: number;
+  serverTime?: string;
 }
 
 export interface 激活码统计 {
@@ -43,7 +48,10 @@ export interface 激活码统计 {
   activated: number;
   partial: number;
   disabled: number;
+  expired: number;
+  activeNow: number;
   todayActivated: number;
+  serverTime?: string;
 }
 
 export interface 操作日志 {
@@ -94,4 +102,3 @@ export const 状态文本: Record<激活码状态, string> = {
   disabled: '已禁用',
   deleted: '已删除'
 };
-

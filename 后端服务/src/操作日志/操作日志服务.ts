@@ -1,10 +1,10 @@
 import { Injectable } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
 import { Like, Repository } from 'typeorm';
 import { 操作日志实体 } from '../数据库模型/操作日志实体';
 import { 激活日志实体 } from '../数据库模型/激活日志实体';
 import { 日志结果枚举 } from '../数据库模型/业务枚举';
 import { 日志查询请求 } from './日志查询请求';
+import { 数据库连接服务 } from '../系统设置/数据库连接服务';
 
 interface 操作日志参数 {
   adminId?: number | null;
@@ -31,16 +31,12 @@ interface 激活日志参数 {
 
 @Injectable()
 export class 操作日志服务 {
-  constructor(
-    @InjectRepository(操作日志实体)
-    private readonly 操作日志仓库: Repository<操作日志实体>,
-    @InjectRepository(激活日志实体)
-    private readonly 激活日志仓库: Repository<激活日志实体>
-  ) {}
+  constructor(private readonly 数据库连接服务: 数据库连接服务) {}
 
   async 记录(params: 操作日志参数) {
-    await this.操作日志仓库.save(
-      this.操作日志仓库.create({
+    const 操作日志仓库 = await this.获取操作日志仓库();
+    await 操作日志仓库.save(
+      操作日志仓库.create({
         adminId: params.adminId ?? null,
         adminUsername: params.adminUsername ?? null,
         action: params.action,
@@ -54,8 +50,9 @@ export class 操作日志服务 {
   }
 
   async 记录激活日志(params: 激活日志参数) {
-    await this.激活日志仓库.save(
-      this.激活日志仓库.create({
+    const 激活日志仓库 = await this.获取激活日志仓库();
+    await 激活日志仓库.save(
+      激活日志仓库.create({
         action: params.action,
         subjectType: params.subjectType,
         subjectId: params.subjectId,
@@ -80,7 +77,8 @@ export class 操作日志服务 {
         ]
       : {};
 
-    const [items, total] = await this.操作日志仓库.findAndCount({
+    const 操作日志仓库 = await this.获取操作日志仓库();
+    const [items, total] = await 操作日志仓库.findAndCount({
       where,
       order: { createdAt: 'DESC' },
       skip: (page - 1) * pageSize,
@@ -100,7 +98,8 @@ export class 操作日志服务 {
         ]
       : {};
 
-    const [items, total] = await this.激活日志仓库.findAndCount({
+    const 激活日志仓库 = await this.获取激活日志仓库();
+    const [items, total] = await 激活日志仓库.findAndCount({
       where,
       order: { createdAt: 'DESC' },
       skip: (page - 1) * pageSize,
@@ -108,5 +107,12 @@ export class 操作日志服务 {
     });
     return { items, total, page, pageSize };
   }
-}
 
+  private 获取操作日志仓库(): Promise<Repository<操作日志实体>> {
+    return this.数据库连接服务.获取仓库(操作日志实体);
+  }
+
+  private 获取激活日志仓库(): Promise<Repository<激活日志实体>> {
+    return this.数据库连接服务.获取仓库(激活日志实体);
+  }
+}

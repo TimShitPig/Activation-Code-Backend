@@ -41,6 +41,13 @@ export function 激活码列表() {
     加载();
   }, [query]);
 
+  useEffect(() => {
+    const timer = window.setInterval(() => {
+      加载();
+    }, 5000);
+    return () => window.clearInterval(timer);
+  }, [query]);
+
   async function 单项操作(id: number, action: 'disable' | 'enable' | 'delete') {
     const map = {
       disable: { method: 'PATCH', url: `/admin/codes/${id}/disable` },
@@ -132,6 +139,7 @@ export function 激活码列表() {
               <th>生成时间</th>
               <th>激活时间</th>
               <th>到期时间</th>
+              <th>剩余时间</th>
               <th>操作</th>
             </tr>
           </thead>
@@ -144,12 +152,19 @@ export function 激活码列表() {
                 <td className="等宽">{item.code}</td>
                 <td>{卡类型文本[item.cardType]}</td>
                 <td>{使用模式文本[item.useMode]}</td>
-                <td><状态标签 状态={item.status as 激活码状态} /></td>
+                <td>
+                  <div className="状态组合">
+                    <状态标签 状态={item.status as 激活码状态} />
+                    {item.isExpired && <span className="到期标签">已到期</span>}
+                    {item.isActiveNow && <span className="有效标签">有效中</span>}
+                  </div>
+                </td>
                 <td>{item.usedCount}/{item.maxUses}</td>
                 <td>{item.boundSubjectId || '-'}</td>
                 <td>{格式时间(item.createdAt)}</td>
                 <td>{格式时间(item.activatedAt)}</td>
                 <td>{格式时间(item.expiresAt)}</td>
+                <td>{格式剩余时间(item.remainingSeconds)}</td>
                 <td className="行操作">
                   {item.status === 'disabled' ? (
                     <button onClick={() => 单项操作(item.id, 'enable')}>启用</button>
@@ -182,3 +197,13 @@ function 格式时间(value: string | null) {
   return new Date(value).toLocaleString('zh-CN', { hour12: false });
 }
 
+function 格式剩余时间(seconds?: number | null) {
+  if (seconds === null || seconds === undefined) return '-';
+  if (seconds <= 0) return '已到期';
+  const days = Math.floor(seconds / 86400);
+  const hours = Math.floor((seconds % 86400) / 3600);
+  const minutes = Math.floor((seconds % 3600) / 60);
+  if (days > 0) return `${days}天 ${hours}小时`;
+  if (hours > 0) return `${hours}小时 ${minutes}分钟`;
+  return `${minutes}分钟`;
+}

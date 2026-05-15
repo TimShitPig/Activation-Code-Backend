@@ -15,6 +15,7 @@ import { 首页概览 } from './首页概览/首页概览';
 import { 激活码列表 } from './激活码列表/激活码列表';
 import { 日志中心 } from './日志中心/日志中心';
 import { 管理员设置 } from './管理员设置/管理员设置';
+import { 初始化设置页面 } from './初始化设置/初始化设置页面';
 
 type 页面 = '概览' | '激活码' | '日志' | '设置';
 
@@ -22,15 +23,20 @@ export function 应用() {
   const [管理员, 设置管理员] = useState<管理员信息 | null>(null);
   const [页面, 设置页面] = useState<页面>('概览');
   const [加载中, 设置加载中] = useState(true);
+  const [已初始化, 设置已初始化] = useState(false);
 
   useEffect(() => {
-    if (!读取令牌()) {
-      设置加载中(false);
-      return;
-    }
-    请求<管理员信息>('/admin/profile')
-      .then(设置管理员)
-      .catch(() => 清除令牌())
+    请求<{ initialized: boolean }>('/setup/status')
+      .then((status) => {
+        设置已初始化(status.initialized);
+        if (!status.initialized || !读取令牌()) return null;
+        return 请求<管理员信息>('/admin/profile')
+          .then(设置管理员)
+          .catch(() => 清除令牌());
+      })
+      .catch(() => {
+        设置已初始化(false);
+      })
       .finally(() => 设置加载中(false));
   }, []);
 
@@ -45,6 +51,9 @@ export function 应用() {
   );
 
   if (加载中) return <div className="全屏加载">正在加载管理后台...</div>;
+  if (!已初始化) {
+    return <初始化设置页面 初始化完成={() => 设置已初始化(true)} />;
+  }
   if (!管理员) return <登录页面 登录成功={设置管理员} />;
 
   return (
@@ -103,4 +112,3 @@ export function 应用() {
     </div>
   );
 }
-

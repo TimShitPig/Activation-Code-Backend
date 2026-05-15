@@ -1,6 +1,5 @@
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Brackets, DataSource, Not, Repository } from 'typeorm';
+import { Brackets, Not } from 'typeorm';
 import {
   卡类型中文名映射,
   卡类型天数映射,
@@ -12,6 +11,7 @@ import { 激活码批次实体 } from '../数据库模型/激活码批次实体'
 import { 激活码实体 } from '../数据库模型/激活码实体';
 import { 当前管理员 } from '../管理员认证/当前管理员';
 import { 操作日志服务 } from '../操作日志/操作日志服务';
+import { 数据库连接服务 } from '../系统设置/数据库连接服务';
 import { 生成激活码请求 } from './生成激活码请求';
 import { 激活码查询请求 } from './激活码查询请求';
 import { 批量动作枚举, 批量操作请求 } from './批量操作请求';
@@ -20,11 +20,7 @@ import { 生成随机激活码, 转CSV值 } from './激活码工具';
 @Injectable()
 export class 激活码管理服务 {
   constructor(
-    @InjectRepository(激活码实体)
-    private readonly 激活码仓库: Repository<激活码实体>,
-    @InjectRepository(激活码批次实体)
-    private readonly 批次仓库: Repository<激活码批次实体>,
-    private readonly dataSource: DataSource,
+    private readonly 数据库连接服务: 数据库连接服务,
     private readonly 操作日志服务: 操作日志服务
   ) {}
 
@@ -37,7 +33,8 @@ export class 激活码管理服务 {
       dto.batchName?.trim() ||
       `${卡类型中文名映射[dto.cardType]}-${使用模式中文名映射[dto.useMode]}-${new Date().toISOString().slice(0, 19)}`;
 
-    const result = await this.dataSource.transaction(async (manager) => {
+    const dataSource = await this.数据库连接服务.获取数据源();
+    const result = await dataSource.transaction(async (manager) => {
       const batch = await manager.save(
         manager.create(激活码批次实体, {
           batchName,
@@ -94,7 +91,8 @@ export class 激活码管理服务 {
   async 查询(query: 激活码查询请求) {
     const page = Math.max(Number(query.page || 1), 1);
     const pageSize = Math.min(Math.max(Number(query.pageSize || 20), 1), 100);
-    const builder = this.激活码仓库
+    const 激活码仓库 = await this.数据库连接服务.获取仓库(激活码实体);
+    const builder = 激活码仓库
       .createQueryBuilder('code')
       .leftJoinAndSelect('code.batch', 'batch')
       .where('code.status != :deleted', { deleted: 激活码状态枚举.已删除 });
@@ -120,32 +118,53 @@ export class 激活码管理服务 {
       .take(pageSize)
       .getManyAndCount();
 
-    return { items, total, page, pageSize };
+    return {
+      items: items.map((item) => this.附加实时状态(item)),
+      total,
+      page,
+      pageSize,
+      serverTime: new Date()
+    };
   }
 
   async 统计() {
-    const [total, unused, activated, partial, disabled] = await Promise.all([
-      this.激活码仓库.count({ where: { status: Not(激活码状态枚举.已删除) } }),
-      this.激活码仓库.count({ where: { status: 激活码状态枚举.未使用 } }),
-      this.激活码仓库.count({ where: { status: 激活码状态枚举.已激活 } }),
-      this.激活码仓库.count({ where: { status: 激活码状态枚举.部分使用 } }),
-      this.激活码仓库.count({ where: { status: 激活码状态枚举.已禁用 } })
+    const 激活码仓库 = await this.数据库连接服务.获取仓库(激活码实体);
+    const now = new Date();
+    const [total, unused, activated, partial, disabled, expired, activeNow] = await Promise.all([
+      激活码仓库.count({ where: { status: Not(激活码状态枚举.已删除) } }),
+      激活码仓库.count({ where: { status: 激活码状态枚举.未使用 } }),
+      激活码仓库.count({ where: { status: 激活码状态枚举.已激活 } }),
+      激活码仓库.count({ where: { status: 激活码状态枚举.部分使用 } }),
+      激活码仓库.count({ where: { status: 激活码状态枚举.已禁用 } }),
+      激活码仓库
+        .createQueryBuilder('code')
+        .where('code.status != :deleted', { deleted: 激活码状态枚举.已删除 })
+        .andWhere('code.expires_at IS NOT NULL')
+        .andWhere('code.expires_at <= :now', { now })
+        .getCount(),
+      激活码仓库
+        .createQueryBuilder('code')
+        .where('code.status != :deleted', { deleted: 激活码状态枚举.已删除 })
+        .andWhere('code.expires_at IS NOT NULL')
+        .andWhere('code.expires_at > :now', { now })
+        .getCount()
     ]);
 
     const today = new Date();
     today.setHours(0, 0, 0, 0);
-    const todayActivated = await this.激活码仓库
+    const todayActivated = await 激活码仓库
       .createQueryBuilder('code')
       .where('code.activated_at >= :today', { today })
       .getCount();
 
-    return { total, unused, activated, partial, disabled, todayActivated };
+    return { total, unused, activated, partial, disabled, expired, activeNow, todayActivated, serverTime: now };
   }
 
   async 禁用(id: number, admin: 当前管理员, ip: string) {
     const code = await this.查找可操作激活码(id);
     code.status = 激活码状态枚举.已禁用;
-    await this.激活码仓库.save(code);
+    const 激活码仓库 = await this.数据库连接服务.获取仓库(激活码实体);
+    await 激活码仓库.save(code);
     await this.操作日志服务.记录({
       adminId: admin.id,
       adminUsername: admin.username,
@@ -159,7 +178,8 @@ export class 激活码管理服务 {
   }
 
   async 启用(id: number, admin: 当前管理员, ip: string) {
-    const code = await this.激活码仓库.findOne({ where: { id } });
+    const 激活码仓库 = await this.数据库连接服务.获取仓库(激活码实体);
+    const code = await 激活码仓库.findOne({ where: { id } });
     if (!code || code.status === 激活码状态枚举.已删除) {
       throw new NotFoundException('激活码不存在');
     }
@@ -169,7 +189,7 @@ export class 激活码管理服务 {
         : code.usedCount >= code.maxUses
           ? 激活码状态枚举.已激活
           : 激活码状态枚举.部分使用;
-    await this.激活码仓库.save(code);
+    await 激活码仓库.save(code);
     await this.操作日志服务.记录({
       adminId: admin.id,
       adminUsername: admin.username,
@@ -185,7 +205,8 @@ export class 激活码管理服务 {
   async 删除(id: number, admin: 当前管理员, ip: string) {
     const code = await this.查找可操作激活码(id);
     code.status = 激活码状态枚举.已删除;
-    await this.激活码仓库.save(code);
+    const 激活码仓库 = await this.数据库连接服务.获取仓库(激活码实体);
+    await 激活码仓库.save(code);
     await this.操作日志服务.记录({
       adminId: admin.id,
       adminUsername: admin.username,
@@ -247,11 +268,27 @@ export class 激活码管理服务 {
   }
 
   private async 查找可操作激活码(id: number) {
-    const code = await this.激活码仓库.findOne({ where: { id } });
+    const 激活码仓库 = await this.数据库连接服务.获取仓库(激活码实体);
+    const code = await 激活码仓库.findOne({ where: { id } });
     if (!code || code.status === 激活码状态枚举.已删除) {
       throw new NotFoundException('激活码不存在');
     }
     return code;
   }
-}
 
+  private 附加实时状态(item: 激活码实体) {
+    const now = Date.now();
+    const expiresAtTime = item.expiresAt ? item.expiresAt.getTime() : null;
+    const remainingSeconds = expiresAtTime ? Math.max(Math.floor((expiresAtTime - now) / 1000), 0) : null;
+    const isExpired = item.status !== 激活码状态枚举.已删除 && !!expiresAtTime && expiresAtTime <= now;
+    const isActiveNow = item.status !== 激活码状态枚举.已禁用 && !!expiresAtTime && expiresAtTime > now;
+
+    return {
+      ...item,
+      isExpired,
+      isActiveNow,
+      remainingSeconds,
+      realtimeStatusText: isExpired ? '已到期' : isActiveNow ? '有效中' : item.status
+    };
+  }
+}
