@@ -1,36 +1,38 @@
 :root {
   font-family: "Microsoft YaHei", "PingFang SC", system-ui, sans-serif;
-  color: #172033;
-  background: #f7f9fc;
-  --颜色-背景: #f7f9fc;
+  color: #111a2e;
+  background: #f4f7fb;
+  --颜色-背景: #f4f7fb;
   --颜色-表面: #ffffff;
-  --颜色-表面弱: #f9fbfd;
-  --颜色-表面选中: #edf4ff;
-  --颜色-文字: #172033;
-  --颜色-次要文字: #607089;
-  --颜色-弱文字: #8792a5;
-  --颜色-边框: #dce3ee;
-  --颜色-弱边框: #e8edf5;
-  --颜色-主色: #1868db;
-  --颜色-主色悬停: #1558bc;
-  --颜色-主色按下: #0c3b8f;
-  --颜色-主色弱背景: #e9f2ff;
-  --颜色-侧栏背景: #101827;
-  --颜色-侧栏表面: #182235;
-  --颜色-侧栏选中: #223149;
-  --颜色-侧栏文字: #e7edf8;
-  --颜色-侧栏弱文字: #a9b4c5;
-  --颜色-成功: #1f845a;
-  --颜色-成功文字: #216e4e;
-  --颜色-成功背景: #eaf8f1;
-  --颜色-警告: #b25e09;
-  --颜色-警告背景: #fff3dc;
-  --颜色-危险: #c9372c;
-  --颜色-危险悬停: #ae2e24;
-  --颜色-危险背景: #ffebe6;
-  --颜色-信息: #1558bc;
-  --颜色-信息背景: #e9f2ff;
-  --阴影-浮层: 0 12px 28px rgba(20, 32, 51, 0.07);
+  --颜色-表面弱: #f8fbff;
+  --颜色-表面选中: #eef7ff;
+  --颜色-文字: #111a2e;
+  --颜色-次要文字: #586984;
+  --颜色-弱文字: #8493aa;
+  --颜色-边框: #d7e1ef;
+  --颜色-弱边框: #e6eef7;
+  --颜色-主色: #1b5cff;
+  --颜色-主色悬停: #1249d8;
+  --颜色-主色按下: #0b3298;
+  --颜色-主色弱背景: #eaf2ff;
+  --颜色-霓虹青: #00bcd4;
+  --颜色-霓虹紫: #7c3aed;
+  --颜色-侧栏背景: #080f1f;
+  --颜色-侧栏表面: #111d33;
+  --颜色-侧栏选中: #172a4a;
+  --颜色-侧栏文字: #f2f7ff;
+  --颜色-侧栏弱文字: #9fb1ca;
+  --颜色-成功: #00a878;
+  --颜色-成功文字: #007a5a;
+  --颜色-成功背景: #e6fbf3;
+  --颜色-警告: #b86e00;
+  --颜色-警告背景: #fff4de;
+  --颜色-危险: #e0314f;
+  --颜色-危险悬停: #bc1f3b;
+  --颜色-危险背景: #fff0f3;
+  --颜色-信息: #155dfc;
+  --颜色-信息背景: #eaf2ff;
+  --阴影-浮层: 0 14px 34px rgba(14, 28, 54, 0.09);
   --阴影-弹窗: 0 24px 80px rgba(16, 24, 39, 0.28);
   font-synthesis: none;
   text-rendering: optimizeLegibility;
@@ -43,7 +45,10 @@
 body {
   margin: 0;
   min-width: 320px;
-  background: var(--颜色-背景);
+  background:
+    radial-gradient(circle at 18% 0, rgba(0, 188, 212, 0.12), transparent 28%),
+    radial-gradient(circle at 86% 12%, rgba(124, 58, 237, 0.09), transparent 30%),
+    var(--颜色-背景);
 }
 
 button,
@@ -106,8 +111,9 @@ button:disabled {
   display: grid;
   place-items: center;
   background:
-    linear-gradient(135deg, rgba(18, 30, 53, 0.94), rgba(26, 44, 76, 0.92)),
-    radial-gradient(circle at top left, rgba(53, 162, 235, 0.2), transparent 32%);
+    radial-gradient(circle at top left, rgba(0, 188, 212, 0.28), transparent 32%),
+    radial-gradient(circle at bottom right, rgba(124, 58, 237, 0.25), transparent 34%),
+    linear-gradient(135deg, rgba(8, 15, 31, 0.98), rgba(15, 23, 42, 0.95));
 }
 
 .登录面板,
@@ -170,7 +176,9 @@ button:disabled {
 }
 
 .侧边栏 {
-  background: var(--颜色-侧栏背景);
+  background:
+    radial-gradient(circle at top left, rgba(0, 188, 212, 0.16), transparent 34%),
+    linear-gradient(180deg, #081020 0%, var(--颜色-侧栏背景) 62%, #070b16 100%);
   color: var(--颜色-侧栏文字);
   padding: 18px;
   display: flex;
@@ -202,8 +210,9 @@ button:disabled {
   display: grid;
   place-items: center;
   color: #fff;
-  background: var(--颜色-主色);
+  background: linear-gradient(135deg, var(--颜色-主色), var(--颜色-霓虹青));
   border-radius: 8px;
+  box-shadow: 0 10px 24px rgba(27, 92, 255, 0.25);
 }
 
 .导航列表 {
@@ -230,7 +239,7 @@ button:disabled {
 .导航项:hover,
 .退出按钮:hover,
 .当前导航 {
-  background: var(--颜色-侧栏选中);
+  background: linear-gradient(90deg, rgba(27, 92, 255, 0.28), rgba(0, 188, 212, 0.12));
   color: var(--颜色-侧栏文字);
   transform: translateX(3px);
 }
@@ -331,12 +340,13 @@ button:disabled {
 }
 
 .按钮-主要 {
-  background: var(--颜色-主色);
+  background: linear-gradient(135deg, var(--颜色-主色), #1b7cff);
   color: #fff;
+  box-shadow: 0 10px 22px rgba(27, 92, 255, 0.22);
 }
 
 .按钮-主要:hover {
-  background: var(--颜色-主色悬停);
+  background: linear-gradient(135deg, var(--颜色-主色悬停), #1667df);
 }
 
 .按钮-次要 {
@@ -352,7 +362,7 @@ button:disabled {
 }
 
 .按钮-危险 {
-  background: var(--颜色-危险);
+  background: linear-gradient(135deg, var(--颜色-危险), #ff4d6d);
   color: #fff;
 }
 
@@ -385,7 +395,7 @@ button:disabled {
 
 .输入框:focus {
   border-color: var(--颜色-主色);
-  box-shadow: 0 0 0 3px rgba(24, 104, 219, 0.14);
+  box-shadow: 0 0 0 3px rgba(27, 92, 255, 0.14), 0 0 0 1px rgba(0, 188, 212, 0.18);
 }
 
 .筛选栏 {
@@ -457,15 +467,23 @@ button:disabled {
   letter-spacing: 0;
 }
 
-.统计-绿 .统计图标 { background: #1f845a; }
-.统计-橙 .统计图标 { background: #b25e09; }
+.统计-绿 .统计图标 { background: linear-gradient(135deg, #00a878, #00c2a8); }
+.统计-橙 .统计图标 { background: linear-gradient(135deg, #b86e00, #ff9f1c); }
 .统计-红 .统计图标 { background: var(--颜色-危险); }
-.统计-青 .统计图标 { background: #0c7894; }
-.统计-蓝 .统计图标 { background: var(--颜色-主色); }
-.统计-紫 .统计图标 { background: #6e5dc6; }
+.统计-青 .统计图标 { background: linear-gradient(135deg, #008ca8, var(--颜色-霓虹青)); }
+.统计-蓝 .统计图标 { background: linear-gradient(135deg, var(--颜色-主色), #1b7cff); }
+.统计-紫 .统计图标 { background: linear-gradient(135deg, var(--颜色-霓虹紫), #a855f7); }
 
 .信息区块 {
   padding: 18px;
+}
+
+form.信息区块 {
+  align-content: start;
+}
+
+form.信息区块 .按钮 {
+  margin-top: 12px;
 }
 
 .信息区块 h2 {
@@ -547,6 +565,18 @@ button:disabled {
   white-space: nowrap;
 }
 
+.数据表格 .选择列 {
+  width: 52px;
+  text-align: center;
+}
+
+.数据表格 input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+  accent-color: var(--颜色-主色);
+  cursor: pointer;
+}
+
 .数据表格 th {
   color: var(--颜色-次要文字);
   background: var(--颜色-表面弱);
@@ -604,8 +634,8 @@ button:disabled {
 }
 
 .有效标签 {
-  background: #e7f8fb;
-  color: #0c7894;
+  background: #e6fbff;
+  color: #007f98;
 }
 
 .状态-unused { background: var(--颜色-信息背景); color: var(--颜色-信息); }

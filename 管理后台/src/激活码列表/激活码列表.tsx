@@ -72,6 +72,17 @@ export function 激活码列表() {
     设置选择((old) => (old.includes(id) ? old.filter((item) => item !== id) : [...old, id]));
   }
 
+  const 当前页ID = 数据?.items.map((item) => item.id) || [];
+  const 当前页已全选 = 当前页ID.length > 0 && 当前页ID.every((id) => 选择.includes(id));
+  const 当前页已部分选择 = 当前页ID.some((id) => 选择.includes(id)) && !当前页已全选;
+
+  function 切换当前页全选() {
+    设置选择((old) => {
+      if (当前页已全选) return old.filter((id) => !当前页ID.includes(id));
+      return Array.from(new Set([...old, ...当前页ID]));
+    });
+  }
+
   return (
     <section className="页面">
       <div className="页面标题">
@@ -129,7 +140,17 @@ export function 激活码列表() {
         <table className="数据表格">
           <thead>
             <tr>
-              <th>选择</th>
+              <th className="选择列">
+                <input
+                  type="checkbox"
+                  aria-label="选择当前页"
+                  checked={当前页已全选}
+                  ref={(input) => {
+                    if (input) input.indeterminate = 当前页已部分选择;
+                  }}
+                  onChange={切换当前页全选}
+                />
+              </th>
               <th>激活码</th>
               <th>卡类型</th>
               <th>模式</th>
@@ -146,8 +167,8 @@ export function 激活码列表() {
           <tbody>
             {数据?.items.map((item) => (
               <tr key={item.id}>
-                <td>
-                  <input type="checkbox" checked={选择.includes(item.id)} onChange={() => 切换选择(item.id)} />
+                <td className="选择列">
+                  <input type="checkbox" aria-label={`选择激活码 ${item.code}`} checked={选择.includes(item.id)} onChange={() => 切换选择(item.id)} />
                 </td>
                 <td className="等宽">{item.code}</td>
                 <td>{卡类型文本[item.cardType]}</td>
