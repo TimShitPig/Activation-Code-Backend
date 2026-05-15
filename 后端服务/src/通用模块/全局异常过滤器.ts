@@ -35,6 +35,10 @@ export class 全局异常过滤器 implements ExceptionFilter {
       message = exception.message;
     }
 
+    if (!(exception instanceof HttpException)) {
+      console.error('未处理异常：', exception);
+    }
+
     response.status(status).json({
       success: false,
       message,
@@ -42,4 +46,3 @@ export class 全局异常过滤器 implements ExceptionFilter {
     });
   }
 }
-

@@ -1,4 +1,9 @@
-import { Injectable, ServiceUnavailableException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  InternalServerErrorException,
+  ServiceUnavailableException
+} from '@nestjs/common';
 import * as bcrypt from 'bcryptjs';
 import { DataSource, EntityTarget, ObjectLiteral, Repository } from 'typeorm';
 import { 管理员实体 } from '../数据库模型/管理员实体';
@@ -46,6 +51,7 @@ export class 数据库连接服务 {
   }
 
   async 连接(database: 数据库配置): Promise<DataSource> {
+    this.校验数据库配置(database);
     if (this.数据源?.isInitialized) return this.数据源;
     this.数据源 = new DataSource({
       type: 'mysql',
@@ -59,11 +65,17 @@ export class 数据库连接服务 {
       synchronize: true,
       logging: false
     });
-    await this.数据源.initialize();
+    try {
+      await this.数据源.initialize();
+    } catch (error) {
+      this.数据源 = null;
+      throw this.创建连接异常(error);
+    }
     return this.数据源;
   }
 
   async 测试连接(database: 数据库配置) {
+    this.校验数据库配置(database);
     const source = new DataSource({
       type: 'mysql',
       host: database.host,
@@ -76,8 +88,15 @@ export class 数据库连接服务 {
       synchronize: false,
       logging: false
     });
-    await source.initialize();
-    await source.destroy();
+    try {
+      await source.initialize();
+    } catch (error) {
+      throw this.创建连接异常(error);
+    } finally {
+      if (source.isInitialized) {
+        await source.destroy();
+      }
+    }
   }
 
   async 初始化管理员() {
@@ -94,5 +113,33 @@ export class 数据库连接服务 {
       })
     );
   }
-}
 
+  private 校验数据库配置(database: 数据库配置) {
+    if (!database) {
+      throw new BadRequestException('数据库配置不能为空');
+    }
+    const missingFields: string[] = [];
+    if (!String(database.host || '').trim()) missingFields.push('MySQL地址');
+    if (!database.port || Number.isNaN(Number(database.port))) missingFields.push('MySQL端口');
+    if (!String(database.username || '').trim()) missingFields.push('MySQL账号');
+    if (!String(database.database || '').trim()) missingFields.push('数据库名');
+    if (missingFields.length > 0) {
+      throw new BadRequestException(`${missingFields.join('、')}不能为空`);
+    }
+    database.host = String(database.host).trim();
+    database.port = Number(database.port);
+    database.username = String(database.username).trim();
+    database.database = String(database.database).trim();
+  }
+
+  private 创建连接异常(error: unknown) {
+    const message = error instanceof Error ? error.message : String(error);
+    console.error('数据库连接失败：', error);
+    if (message.includes("reading 'databaseName'")) {
+      return new InternalServerErrorException(
+        '数据库表结构同步失败，请确认填写的是本系统使用的 MySQL 数据库；如果是旧库，请备份后清空旧表再重新初始化'
+      );
+    }
+    return new InternalServerErrorException(`数据库连接失败：${message}`);
+  }
+}
