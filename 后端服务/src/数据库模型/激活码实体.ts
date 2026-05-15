@@ -46,7 +46,7 @@ export class 激活码实体 {
   @Column({ name: 'used_count', default: 0, comment: '已使用次数' })
   usedCount: number;
 
-  @Column({ name: 'batch_id', nullable: true, comment: '批次ID' })
+  @Column({ name: 'batch_id', type: 'int', nullable: true, comment: '批次ID' })
   batchId: number | null;
 
   @Column({ name: 'activated_at', type: 'datetime', nullable: true, comment: '首次激活时间' })
@@ -55,10 +55,10 @@ export class 激活码实体 {
   @Column({ name: 'expires_at', type: 'datetime', nullable: true, comment: '最近一次激活后的到期时间' })
   expiresAt: Date | null;
 
-  @Column({ name: 'bound_subject_type', length: 32, nullable: true, comment: '绑定主体类型' })
+  @Column({ name: 'bound_subject_type', type: 'varchar', length: 32, nullable: true, comment: '绑定主体类型' })
   boundSubjectType: string | null;
 
-  @Column({ name: 'bound_subject_id', length: 128, nullable: true, comment: '绑定主体ID' })
+  @Column({ name: 'bound_subject_id', type: 'varchar', length: 128, nullable: true, comment: '绑定主体ID' })
   boundSubjectId: string | null;
 
   @Column({ name: 'remark', type: 'varchar', length: 255, nullable: true, comment: '备注' })
@@ -77,4 +77,3 @@ export class 激活码实体 {
   @OneToMany(() => 兑换记录实体, (record) => record.codeEntity)
   redemptions: 兑换记录实体[];
 }
-

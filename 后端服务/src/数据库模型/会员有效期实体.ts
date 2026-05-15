@@ -22,7 +22,7 @@ export class 会员有效期实体 {
   @Column({ name: 'expires_at', type: 'datetime', comment: '会员到期时间' })
   expiresAt: Date;
 
-  @Column({ name: 'last_code_id', nullable: true, comment: '最近使用的激活码ID' })
+  @Column({ name: 'last_code_id', type: 'int', nullable: true, comment: '最近使用的激活码ID' })
   lastCodeId: number | null;
 
   @CreateDateColumn({ name: 'created_at', comment: '创建时间' })
@@ -31,4 +31,3 @@ export class 会员有效期实体 {
   @UpdateDateColumn({ name: 'updated_at', comment: '更新时间' })
   updatedAt: Date;
 }
-

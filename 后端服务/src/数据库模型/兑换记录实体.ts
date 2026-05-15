@@ -30,7 +30,7 @@ export class 兑换记录实体 {
   @Column({ name: 'expires_at', type: 'datetime', comment: '本次续费后到期时间' })
   expiresAt: Date;
 
-  @Column({ name: 'ip', length: 64, nullable: true, comment: '客户端IP' })
+  @Column({ name: 'ip', type: 'varchar', length: 64, nullable: true, comment: '客户端IP' })
   ip: string | null;
 
   @CreateDateColumn({ name: 'created_at', comment: '兑换时间' })
@@ -40,4 +40,3 @@ export class 兑换记录实体 {
   @JoinColumn({ name: 'code_id' })
   codeEntity: 激活码实体;
 }
-

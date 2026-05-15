@@ -28,7 +28,7 @@ export class 激活码批次实体 {
   @Column({ name: 'max_uses', default: 1, comment: '单码最大使用人数或次数' })
   maxUses: number;
 
-  @Column({ name: 'created_by', nullable: true, comment: '创建管理员ID' })
+  @Column({ name: 'created_by', type: 'int', nullable: true, comment: '创建管理员ID' })
   createdBy: number | null;
 
   @Column({ name: 'remark', type: 'varchar', length: 255, nullable: true, comment: '备注' })
@@ -40,4 +40,3 @@ export class 激活码批次实体 {
   @OneToMany(() => 激活码实体, (code) => code.batch)
   codes: 激活码实体[];
 }
-

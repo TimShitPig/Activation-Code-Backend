@@ -6,19 +6,19 @@ export class 操作日志实体 {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column({ name: 'admin_id', nullable: true, comment: '管理员ID' })
+  @Column({ name: 'admin_id', type: 'int', nullable: true, comment: '管理员ID' })
   adminId: number | null;
 
-  @Column({ name: 'admin_username', length: 64, nullable: true, comment: '管理员账号' })
+  @Column({ name: 'admin_username', type: 'varchar', length: 64, nullable: true, comment: '管理员账号' })
   adminUsername: string | null;
 
   @Column({ name: 'action', length: 64, comment: '操作动作' })
   action: string;
 
-  @Column({ name: 'target_type', length: 64, nullable: true, comment: '目标类型' })
+  @Column({ name: 'target_type', type: 'varchar', length: 64, nullable: true, comment: '目标类型' })
   targetType: string | null;
 
-  @Column({ name: 'target_id', length: 128, nullable: true, comment: '目标ID' })
+  @Column({ name: 'target_id', type: 'varchar', length: 128, nullable: true, comment: '目标ID' })
   targetId: string | null;
 
   @Column({ name: 'result', type: 'varchar', length: 32, default: 日志结果枚举.成功, comment: '操作结果' })
@@ -27,10 +27,9 @@ export class 操作日志实体 {
   @Column({ name: 'detail', type: 'text', nullable: true, comment: '详情' })
   detail: string | null;
 
-  @Column({ name: 'ip', length: 64, nullable: true, comment: 'IP地址' })
+  @Column({ name: 'ip', type: 'varchar', length: 64, nullable: true, comment: 'IP地址' })
   ip: string | null;
 
   @CreateDateColumn({ name: 'created_at', comment: '记录时间' })
   createdAt: Date;
 }
-
