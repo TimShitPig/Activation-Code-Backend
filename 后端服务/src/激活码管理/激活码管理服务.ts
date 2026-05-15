@@ -113,7 +113,7 @@ export class 激活码管理服务 {
     if (query.batchName) builder.andWhere('batch.batch_name LIKE :batchName', { batchName: `%${query.batchName}%` });
 
     const [items, total] = await builder
-      .orderBy('code.created_at', 'DESC')
+      .orderBy('code.createdAt', 'DESC')
       .skip((page - 1) * pageSize)
       .take(pageSize)
       .getManyAndCount();
