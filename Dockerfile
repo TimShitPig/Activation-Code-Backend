@@ -25,8 +25,6 @@ COPY package*.json ./
 COPY 后端服务/package.json ./后端服务/package.json
 COPY 管理后台/package.json ./管理后台/package.json
 COPY --from=builder /workspace/node_modules ./node_modules
-COPY --from=builder /workspace/后端服务/node_modules ./后端服务/node_modules
-COPY --from=builder /workspace/管理后台/node_modules ./管理后台/node_modules
 
 COPY --from=builder /workspace/后端服务/dist ./后端服务/dist
 COPY --from=builder /workspace/管理后台/dist ./管理后台/dist

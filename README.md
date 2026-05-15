@@ -7,7 +7,7 @@
 - 全中文管理后台：登录、初始化、概览、激活码列表、日志中心、管理员设置。
 - 网页初始化：第一次部署后直接打开网页填写 MySQL、管理员账号、机器人密钥。
 - 远程 MySQL：不在 Docker 中内置数据库，适合连接云数据库或已有 MySQL。
-- Docker 单容器启动：`docker compose -f docker-compose.dev.yml up -d --build`。
+- Docker 单容器启动：`docker compose -f docker-compose.dev.yml up -d --build --quiet-build`。
 - 实时业务更新：机器人激活后后台自动刷新显示已激活、有效中、剩余时间。
 - 到期状态展示：后台自动计算已到期、有效中和剩余时间。
 - 批量管理：批量禁用、启用、删除、导出 CSV。
@@ -62,7 +62,7 @@ Activation-Code-Backend/
 ```bash
 git clone https://github.com/TimShitPig/Activation-Code-Backend.git
 cd Activation-Code-Backend
-docker compose -f docker-compose.dev.yml up -d --build
+docker compose -f docker-compose.dev.yml up -d --build --quiet-build
 ```
 
 启动后访问：
@@ -86,10 +86,12 @@ cp 部署配置/.env.example .env
 然后编辑 `.env` 后再执行：
 
 ```bash
-docker compose -f docker-compose.dev.yml up -d --build
+docker compose -f docker-compose.dev.yml up -d --build --quiet-build
 ```
 
 不复制 `.env` 也可以直接启动，第一次打开网页会进入初始化向导。
+
+`--quiet-build` 会隐藏 Docker 构建时不断刷新的步骤输出。如果需要排查构建失败，可以临时去掉它查看完整日志。
 
 ## 第一次网页初始化
 
@@ -352,7 +354,7 @@ WATCHPACK_POLLING: "true"
 ```bash
 cd Activation-Code-Backend
 git pull
-docker compose -f docker-compose.dev.yml up -d --build
+docker compose -f docker-compose.dev.yml up -d --build --quiet-build
 ```
 
 配置文件 `数据/系统配置.json` 不会被 Git 覆盖。
