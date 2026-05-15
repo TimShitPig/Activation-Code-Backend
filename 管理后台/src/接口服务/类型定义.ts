@@ -101,6 +101,29 @@ export interface 系统更新状态 {
   checkError: string | null;
   checkedAt: string;
   updateCommands: string[];
+  updateTask: 更新任务状态 | null;
+}
+
+export interface 自动更新结果 {
+  message: string;
+  stage: 更新任务阶段;
+  startedAt: string;
+  workdir: string;
+  logFile: string;
+  updateCommands: string[];
+}
+
+export type 更新任务阶段 = 'installing' | 'installed' | 'restarting' | 'completed' | 'failed';
+
+export interface 更新任务状态 {
+  stage: 更新任务阶段;
+  message: string;
+  startedAt: string;
+  finishedAt: string | null;
+  workdir: string;
+  logFile: string;
+  updateCommands: string[];
+  error?: string | null;
 }
 
 export const 卡类型文本: Record<卡类型, string> = {

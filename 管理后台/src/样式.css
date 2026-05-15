@@ -685,12 +685,58 @@ button:disabled {
   line-height: 1.7;
 }
 
+.更新任务提示 {
+  display: grid;
+  gap: 10px;
+  border: 1px solid #d7dce5;
+  border-radius: 8px;
+  padding: 12px;
+  background: #f8fafc;
+}
+
+.更新任务提示 strong,
+.更新任务提示 span {
+  display: block;
+}
+
+.更新任务提示 span {
+  color: #65758b;
+  font-size: 13px;
+  margin-top: 4px;
+}
+
+.更新任务提示.任务进行中 {
+  border-color: #bfdbfe;
+  background: #eff6ff;
+}
+
+.更新任务提示.任务完成 {
+  border-color: #bbf7d0;
+  background: #ecfdf5;
+}
+
+.更新任务提示.任务失败 {
+  border-color: #fecaca;
+  background: #fef2f2;
+}
+
+.更新任务详情 {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(160px, 1fr));
+  gap: 10px;
+}
+
+.更新任务详情 span {
+  overflow-wrap: anywhere;
+}
+
 @media (max-width: 1120px) {
   .统计网格 {
     grid-template-columns: repeat(3, 1fr);
   }
 
-  .更新摘要 {
+  .更新摘要,
+  .更新任务详情 {
     grid-template-columns: repeat(2, 1fr);
   }
 }
@@ -731,6 +777,7 @@ button:disabled {
   }
 
   .更新摘要,
+  .更新任务详情,
   .区块标题行 {
     grid-template-columns: 1fr;
   }

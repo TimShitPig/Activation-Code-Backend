@@ -1,7 +1,7 @@
 import { FormEvent, useEffect, useState } from 'react';
-import { AlertTriangle, CheckCircle2, Copy, ExternalLink, GitCommit, KeyRound, RefreshCcw, ServerCog } from 'lucide-react';
+import { AlertTriangle, CheckCircle2, Copy, ExternalLink, GitCommit, KeyRound, Power, RefreshCcw, ServerCog, UploadCloud } from 'lucide-react';
 import { 请求 } from '../接口服务/接口客户端';
-import { 管理员信息, 系统更新状态 } from '../接口服务/类型定义';
+import { 管理员信息, 系统更新状态, 自动更新结果, 更新任务阶段 } from '../接口服务/类型定义';
 import { 按钮 } from '../通用组件/按钮';
 import { 输入框 } from '../通用组件/输入框';
 
@@ -13,11 +13,23 @@ export function 管理员设置({ 管理员 }: { 管理员: 管理员信息 }) {
   const [更新状态, 设置更新状态] = useState<系统更新状态 | null>(null);
   const [更新错误, 设置更新错误] = useState('');
   const [更新加载中, 设置更新加载中] = useState(false);
+  const [自动更新中, 设置自动更新中] = useState(false);
+  const [自动更新结果, 设置自动更新结果] = useState<自动更新结果 | null>(null);
   const [命令已复制, 设置命令已复制] = useState(false);
 
   useEffect(() => {
     加载更新状态();
   }, []);
+
+  useEffect(() => {
+    const task = 更新状态?.updateTask;
+    if (!task || (task.stage !== 'installing' && task.stage !== 'restarting')) return;
+
+    const timer = window.setInterval(() => {
+      加载更新状态();
+    }, 5000);
+    return () => window.clearInterval(timer);
+  }, [更新状态?.updateTask?.stage, 更新状态?.updateTask?.startedAt, 更新状态?.updateTask?.finishedAt]);
 
   async function 加载更新状态() {
     设置更新加载中(true);
@@ -60,6 +72,57 @@ export function 管理员设置({ 管理员 }: { 管理员: 管理员信息 }) {
     }
   }
 
+  async function 执行安装更新() {
+    await 执行更新请求('/admin/update/run', '自动更新启动失败');
+  }
+
+  async function 执行重启更新() {
+    await 执行更新请求('/admin/update/restart', '重启更新启动失败');
+  }
+
+  async function 执行更新请求(path: string, fallback: string) {
+    设置更新错误('');
+    设置自动更新结果(null);
+    设置自动更新中(true);
+    try {
+      const result = await 请求<自动更新结果>(path, {
+        method: 'POST'
+      });
+      设置自动更新结果(result);
+      设置更新状态((current) => current ? {
+        ...current,
+        updateTask: {
+          stage: result.stage,
+          message: result.message,
+          startedAt: result.startedAt,
+          finishedAt: null,
+          workdir: result.workdir,
+          logFile: result.logFile,
+          updateCommands: result.updateCommands,
+          error: null
+        }
+      } : current);
+    } catch (error) {
+      设置更新错误(error instanceof Error ? error.message : fallback);
+    } finally {
+      设置自动更新中(false);
+    }
+  }
+
+  const 当前更新任务 = 更新状态?.updateTask || null;
+  const 更新任务运行中 = 当前更新任务?.stage === 'installing' || 当前更新任务?.stage === 'restarting';
+  const 可重启更新 = 当前更新任务?.stage === 'installed';
+  const 自动更新按钮禁用 = 自动更新中 || 更新加载中 || 更新任务运行中 || (!更新状态?.hasUpdate && !可重启更新);
+  const 自动更新按钮文本 = 自动更新中
+    ? '提交中'
+    : 当前更新任务?.stage === 'installing'
+      ? '安装中'
+      : 当前更新任务?.stage === 'restarting'
+        ? '重启中'
+        : 可重启更新
+          ? '立即重启'
+          : '安装更新';
+
   return (
     <section className="页面">
       <div className="页面标题">
@@ -89,12 +152,40 @@ export function 管理员设置({ 管理员 }: { 管理员: 管理员信息 }) {
         <div className="信息区块 设置整行">
           <div className="区块标题行">
             <h2>系统更新</h2>
-            <按钮 类型="次要" 图标={<RefreshCcw size={18} />} disabled={更新加载中} onClick={加载更新状态}>
-              {更新加载中 ? '检查中' : '重新检查'}
-            </按钮>
+            <div className="标题操作">
+              <按钮
+                图标={可重启更新 ? <Power size={18} /> : <UploadCloud size={18} />}
+                disabled={自动更新按钮禁用}
+                onClick={可重启更新 ? 执行重启更新 : 执行安装更新}
+              >
+                {自动更新按钮文本}
+              </按钮>
+              <按钮 类型="次要" 图标={<RefreshCcw size={18} />} disabled={更新加载中 || 自动更新中 || 更新任务运行中} onClick={加载更新状态}>
+                {更新加载中 ? '检查中' : '重新检查'}
+              </按钮>
+            </div>
           </div>
 
           {更新错误 && <div className="错误提示">{更新错误}</div>}
+          {自动更新结果 && (
+            <div className="成功提示">
+              {自动更新结果.message}，日志文件：<span className="等宽">{自动更新结果.logFile}</span>
+            </div>
+          )}
+          {当前更新任务 && (
+            <div className={`更新任务提示 ${当前更新任务.stage === 'failed' ? '任务失败' : 当前更新任务.stage === 'completed' ? '任务完成' : '任务进行中'}`}>
+              <div>
+                <strong>{更新任务阶段文本(当前更新任务.stage)}</strong>
+                <span>{当前更新任务.message || '-'}</span>
+              </div>
+              <div className="更新任务详情">
+                <span>开始：{格式时间(当前更新任务.startedAt)}</span>
+                <span>完成：{格式时间(当前更新任务.finishedAt)}</span>
+                <span>日志：<span className="等宽">{当前更新任务.logFile || '-'}</span></span>
+              </div>
+              {当前更新任务.error && <div className="危险文字">{当前更新任务.error}</div>}
+            </div>
+          )}
 
           {更新状态 && (
             <div className="更新内容">
@@ -174,4 +265,15 @@ export function 管理员设置({ 管理员 }: { 管理员: 管理员信息 }) {
 function 格式时间(value: string | null) {
   if (!value) return '-';
   return new Date(value).toLocaleString('zh-CN', { hour12: false });
+}
+
+function 更新任务阶段文本(stage: 更新任务阶段) {
+  const text: Record<更新任务阶段, string> = {
+    installing: '正在安装更新',
+    installed: '更新已安装',
+    restarting: '正在重启服务',
+    completed: '更新已完成',
+    failed: '更新失败'
+  };
+  return text[stage];
 }
