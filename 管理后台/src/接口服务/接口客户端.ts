@@ -1,4 +1,4 @@
-const API_BASE = import.meta.env.VITE_API_BASE || 'http://localhost:3000/api';
+const API_BASE = import.meta.env.VITE_API_BASE || 'http://localhost:7789/api';
 
 interface 接口响应<T> {
   success: boolean;
@@ -57,4 +57,3 @@ export async function 下载文件(path: string, filename: string) {
   link.click();
   URL.revokeObjectURL(url);
 }
-

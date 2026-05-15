@@ -68,13 +68,13 @@ docker compose -f docker-compose.dev.yml up -d --build
 启动后访问：
 
 ```text
-http://服务器IP:5173
+http://服务器IP:7788
 ```
 
 后端接口地址：
 
 ```text
-http://服务器IP:3000/api
+http://服务器IP:7789/api
 ```
 
 ## 第一次网页初始化
@@ -316,7 +316,7 @@ npm.cmd run dev -w 管理后台
 访问：
 
 ```text
-http://localhost:5173
+http://localhost:7788
 ```
 
 ## 构建检查
@@ -362,4 +362,3 @@ npm.cmd run build -w 管理后台
 - `数据/` 已加入 `.gitignore`，不要手动上传该目录。
 - 生产环境建议使用强管理员密码。
 - 机器人密钥建议使用随机长字符串。
-
