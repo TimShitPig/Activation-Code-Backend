@@ -1,0 +1,41 @@
+services:
+  后端服务:
+    build:
+      context: ./后端服务
+      dockerfile: Dockerfile
+    container_name: 激活码后端服务
+    working_dir: /app
+    env_file:
+      - ./部署配置/.env.example
+    volumes:
+      - ./后端服务:/app
+      - 后端_node_modules:/app/node_modules
+    ports:
+      - "3000:3000"
+    command: sh -c "npm install && npm run dev"
+    environment:
+      CHOKIDAR_USEPOLLING: "true"
+      WATCHPACK_POLLING: "true"
+
+  管理后台:
+    build:
+      context: ./管理后台
+      dockerfile: Dockerfile
+    container_name: 激活码管理后台
+    working_dir: /app
+    volumes:
+      - ./管理后台:/app
+      - 后台_node_modules:/app/node_modules
+    ports:
+      - "5173:5173"
+    command: sh -c "npm install && npm run dev"
+    environment:
+      CHOKIDAR_USEPOLLING: "true"
+      WATCHPACK_POLLING: "true"
+      VITE_API_BASE: "http://localhost:3000/api"
+    depends_on:
+      - 后端服务
+
+volumes:
+  后端_node_modules:
+  后台_node_modules:

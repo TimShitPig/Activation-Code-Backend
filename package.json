@@ -1,0 +1,18 @@
+{
+  "name": "zhongwen-jihuoma-xitong",
+  "private": true,
+  "version": "1.0.0",
+  "description": "中文化激活码后端与管理后台",
+  "workspaces": [
+    "后端服务",
+    "管理后台"
+  ],
+  "scripts": {
+    "安装依赖": "npm.cmd install",
+    "开发:后端": "npm.cmd run dev -w 后端服务",
+    "开发:后台": "npm.cmd run dev -w 管理后台",
+    "构建": "npm.cmd run build -w 后端服务 && npm.cmd run build -w 管理后台",
+    "检查": "npm.cmd run typecheck -w 后端服务 && npm.cmd run typecheck -w 管理后台"
+  }
+}
+

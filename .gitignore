@@ -1,0 +1,11 @@
+node_modules/
+dist/
+.env
+.env.local
+.DS_Store
+npm-debug.log*
+*.log
+coverage/
+管理后台/dist/
+后端服务/dist/
+
