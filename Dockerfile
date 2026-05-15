@@ -25,7 +25,10 @@ ENV NODE_ENV=production
 ENV PORT=7790
 ENV SYSTEM_CONFIG_PATH=/app/data/系统配置.json
 ENV npm_config_registry=https://registry.npmmirror.com
-RUN apk add --no-cache git docker-cli docker-cli-compose
+ARG ALPINE_REPOSITORY=https://mirrors.aliyun.com/alpine
+RUN alpine_version="$(cut -d. -f1,2 /etc/alpine-release)" \
+  && printf "%s/v%s/main\n%s/v%s/community\n" "$ALPINE_REPOSITORY" "$alpine_version" "$ALPINE_REPOSITORY" "$alpine_version" > /etc/apk/repositories \
+  && apk add --no-cache git docker-cli docker-cli-compose
 
 COPY package*.json ./
 COPY 后端服务/package.json ./后端服务/package.json

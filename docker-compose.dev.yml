@@ -3,6 +3,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
+      network: host
       args:
         APP_COMMIT: "${APP_COMMIT:-unknown}"
         APP_VERSION: "${APP_VERSION:-1.0.0}"
